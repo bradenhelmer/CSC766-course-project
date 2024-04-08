@@ -1,0 +1,7 @@
+for (k=0;k<NK;k++) {
+ for (i=0;i<M;i++) {
+   for (j=0;j<D;j++) {
+      S = S + x[i,j]*w[j]
+  }
+ }
+}
