@@ -1,5 +1,0 @@
-while (d<=le-8) {
- for (i=0;i<N;i++) {
-   d = d + a[i]+b[i]*w
- }
-}

@@ -1,5 +1,0 @@
-while (iteration<NOiteration) {
- for (i=0;i<m;i++) {
-   d = d + a[i]+b[i]*w
- }
-}

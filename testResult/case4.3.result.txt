@@ -1,5 +1,0 @@
-for (k=0;k<NK;k++) {
- for (ii=0;ii<D;ii++) {
-   w[ii] = w[ii] + r*d[ii]
- }
-}

@@ -1,7 +1,0 @@
-for (k=2;k<NK;k++) {
- for (j=2;j<NJ;j++) {
-   for (i=2;i<NI;i++) {
-      x = (i+1)/(NI+1)
-  }
- }
-}

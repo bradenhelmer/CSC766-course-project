@@ -1,5 +1,0 @@
-for (inter=0;inter<iter;inter++) {
- for (j=0;j<N;j++) {
-   a[2*i] = a[2*i] + b[j]
- }
-}
