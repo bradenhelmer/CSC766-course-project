@@ -64,11 +64,11 @@ int main() {
 
   for (int inter = 0; inter < iter; inter++) {
     for (i = 0; i < N; i++) {
-      for (j = 0; j <= N; j++) {
+      for (j = 0; j < N; j++) {
         a[2 * i] = a[2 * i] + b[j];
       }
 
-      for (j = 0; j <= N; j++) {
+      for (j = 0; j < N; j++) {
         a[2 * i + 1] = a[2 * i + 1] + b[j];
       }
     }

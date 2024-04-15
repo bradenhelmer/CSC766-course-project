@@ -73,7 +73,6 @@ double rtclock() {
 double t_start, t_end;
 
 int main() {
-  register double s;
 
   init_array();
 

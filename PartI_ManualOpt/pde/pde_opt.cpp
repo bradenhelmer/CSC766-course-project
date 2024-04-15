@@ -16,10 +16,9 @@
  * =====================================================================================
  */
 
-
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <sys/time.h>
 
 typedef long LARGE_INTEGER;
@@ -38,75 +37,62 @@ double c[6][14];
 #define IF_TIME(foo)
 #endif
 
-//array initialization
-void init_array()
-{
-  for(int k = 0; k < zn; k++){
-    for(int j = 0; j < yn; j++){
-      for(int i = 0; i < xn; i++){
-        for(int m = 0; m < 6; m++){
+// array initialization
+void init_array() {
+  for (int k = 0; k < zn; k++) {
+    for (int j = 0; j < yn; j++) {
+      for (int i = 0; i < xn; i++) {
+        for (int m = 0; m < 6; m++) {
           u[m][i][j][k] = i + j + k + m;
         }
       }
     }
   }
 
-
-  for(int m = 0; m < 6; m++){
-    for(int h = 0; h < 14; h++){
-       c[m][h] = m + h;
+  for (int m = 0; m < 6; m++) {
+    for (int h = 0; h < 14; h++) {
+      c[m][h] = m + h;
     }
   }
 }
 
-
-//define timer for performance measurement
-double rtclock()
-{
+// define timer for performance measurement
+double rtclock() {
   struct timezone Tzp;
   struct timeval Tp;
   int stat;
-  stat = gettimeofday (&Tp, &Tzp);
-  if (stat != 0) printf("Error return from gettimeofday: %d",stat);
-  return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
+  stat = gettimeofday(&Tp, &Tzp);
+  if (stat != 0)
+    printf("Error return from gettimeofday: %d", stat);
+  return (Tp.tv_sec + Tp.tv_usec * 1.0e-6);
 }
 double t_start, t_end;
 
-
-//example4
-void example4(){
-  for(int k = 2; k < zn-1; k++){
-    double zi = ((double)(k-1))/zn;
-    for(int j = 2; j < yn-1; j++){
-      double yi = ((double)(j-1))/yn;
-      for(int i = 2; i < xn-1; i++){
-        double xi = ((double)(i-1))/xn;
-        for(int m = 0; m < 6; m++){
-          d[m][i] =   c[m][2] * xi \
-                      + c[m][3] * yi \
-                      + c[m][4] * zi \
-                      + c[m][5] * xi * xi \
-                      + c[m][6] * yi * yi \
-                      + c[m][7] * zi * zi\
-                      + c[m][8] * xi * xi * xi \
-                      + c[m][9] * yi * yi * yi\
-                      + c[m][10]* zi * zi * zi \
-                      + c[m][11]* xi * xi * xi * xi   \
-                      + c[m][12]* yi * yi * yi * yi  \
-                      + c[m][13]* xi * yi * zi * zi;
-        }             
-        for(int m = 0; m < 6; m++){
+// example4
+double example4() {
+  for (int k = 2; k < zn - 1; k++) {
+    double zi = ((double)(k - 1)) / zn;
+    for (int j = 2; j < yn - 1; j++) {
+      double yi = ((double)(j - 1)) / yn;
+      for (int i = 2; i < xn - 1; i++) {
+        double xi = ((double)(i - 1)) / xn;
+        for (int m = 0; m < 6; m++) {
+          d[m][i] = c[m][2] * xi + c[m][3] * yi + c[m][4] * zi +
+                    c[m][5] * xi * xi + c[m][6] * yi * yi + c[m][7] * zi * zi +
+                    c[m][8] * xi * xi * xi + c[m][9] * yi * yi * yi +
+                    c[m][10] * zi * zi * zi + c[m][11] * xi * xi * xi * xi +
+                    c[m][12] * yi * yi * yi * yi + c[m][13] * xi * yi * zi * zi;
+        }
+        for (int m = 0; m < 6; m++) {
           u[m][i][j][k] += d[m][i];
-        } 
+        }
       }
     }
   }
-  return u[5][xn-2][yn-2][zn-2];
+  return u[5][xn - 2][yn - 2][zn - 2];
 }
 
-
-int main()
-{
+int main() {
   init_array();
 
   IF_TIME(t_start = rtclock());
@@ -117,4 +103,3 @@ int main()
   printf("result: %f\n", rst_org);
   return 0;
 }
-

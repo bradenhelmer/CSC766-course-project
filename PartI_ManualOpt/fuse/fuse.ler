@@ -1,0 +1,19 @@
+LER notation for fuse.cpp
+
+F_org:
+	Γinter∫0,iter∫ Γi∫0,N∫ Σj∫0,N∫ a[2 * i]$i$ + b[j] = a[2 * i]$i$
+	Γinter∫0,iter∫ Γi∫0,N∫ Σj∫0,N∫ a[2 * i + 1]$i$ + b[j] = a[2 * i + 1]$i$
+
+f*:
+	Γinter∫0,iter∫ Γi∫0,N∫ Σj∫0,N∫ a{i}$i$ + b{j} = a{i}$i$
+	Γinter∫0,iter∫ Γi∫0,N∫ Σj∫0,N∫ a{i}$i$ + b{j} = a{i}$i$
+
+h':
+	Σj∫0,N∫	b[j] = tmp1
+	Γinter∫0,iter∫ Γi∫0,N∫ a[2 * i]$i$ + tmp1 = a[2 * i]$i$
+	Γinter∫0,iter∫ Γi∫0,N∫ a[2 * i + 1]$i$ + tmp1 = a[2 * i + 1]$i$
+
+I:
+	Σj∫0,N∫	b[j] = tmp1
+	Γinter∫0,iter∫ Γi∫0,N∫ tmp1 = a[i]$i$
+	

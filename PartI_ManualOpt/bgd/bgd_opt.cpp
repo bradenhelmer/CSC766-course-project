@@ -16,13 +16,12 @@
  * =====================================================================================
  */
 
-
+#include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include <unistd.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 typedef long LARGE_INTEGER;
 
@@ -40,68 +39,62 @@ double x[M][D];
 #define IF_TIME(foo)
 #endif
 
-//array initialization
-void init_array()
-{
+// array initialization
+void init_array() {
   int i, j;
 
-  for (i=0; i<M; i++) {
-    for (j=0; j<D; j++) {
+  for (i = 0; i < M; i++) {
+    for (j = 0; j < D; j++) {
       x[i][j] = i + j;
     }
   }
 }
 
-
-//define timer for performance measurement
-double rtclock()
-{
+// define timer for performance measurement
+double rtclock() {
   struct timezone Tzp;
   struct timeval Tp;
   int stat;
-  stat = gettimeofday (&Tp, &Tzp);
-  if (stat != 0) printf("Error return from gettimeofday: %d",stat);
-  return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
+  stat = gettimeofday(&Tp, &Tzp);
+  if (stat != 0)
+    printf("Error return from gettimeofday: %d", stat);
+  return (Tp.tv_sec + Tp.tv_usec * 1.0e-6);
 }
 double t_start, t_end;
 
+// example5
+double example5() {
 
-
-//example5
-double example5(){
-
-  double w[D]; 
-  double d[D]; 
+  double w[D];
+  double d[D];
 
   double r = r0;
-  for(int j = 0; j < D; j++){
+  for (int j = 0; j < D; j++) {
     w[j] = 0;
   }
 
-  for(int k = 0; k < NOiteration; k++){
-    //prepare for reduction on array d[j]
-    for(int j = 0; j < D; j++){
+  for (int k = 0; k < NOiteration; k++) {
+    // prepare for reduction on array d[j]
+    for (int j = 0; j < D; j++) {
       d[j] = 0;
     }
-    for(int i = 0; i < M; i++){
+    for (int i = 0; i < M; i++) {
       double s = 0;
-      for(int j = 0; j < D; j++){
-        s = s + x[i][j]*w[j];
+      for (int j = 0; j < D; j++) {
+        s = s + x[i][j] * w[j];
       }
-      for(int j = 0; j < D; j++){
-        d[j] = d[j] +s*x[i][j]; 
+      for (int j = 0; j < D; j++) {
+        d[j] = d[j] + s * x[i][j];
       }
     }
-    for(int j = 0; j < D; j++){
-      w[j] = w[j] + r*d[j];
+    for (int j = 0; j < D; j++) {
+      w[j] = w[j] + r * d[j];
     }
   }
-  return w[D-1];
+  return w[D - 1];
 }
 
-
-int main()
-{
+int main() {
   int i, j, k;
 
   init_array();
@@ -114,4 +107,3 @@ int main()
   printf("result: %f\n", rst_org);
   return 0;
 }
-

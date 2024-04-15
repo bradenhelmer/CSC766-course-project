@@ -58,10 +58,10 @@ int main() {
 #pragma endscop
 
   IF_TIME(t_end = rtclock());
-  IF_TIME(fprintf(stdout, "%0.6lfs\n", t_end - t_start));
+  IF_TIME(fprintf(stdout, "time %0.6lfs\n", t_end - t_start));
 
   double rst_org = c[NMAX - 1][NMAX - 1];
 
-  printf("result %f\n", rst_org);
+  printf("result: %f\n", rst_org);
   return 0;
 }

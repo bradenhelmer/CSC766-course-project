@@ -73,7 +73,6 @@ double rtclock() {
 double t_start, t_end;
 
 int main() {
-  register double s;
 
   init_array();
 
@@ -102,6 +101,6 @@ int main() {
 #ifdef TEST
   print_array();
 #endif
-  printf("rst_org=%f\n", rst_org);
+  printf("result: %f\n", rst_org);
   return 0;
 }

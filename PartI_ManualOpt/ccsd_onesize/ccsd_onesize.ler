@@ -1,0 +1,4 @@
+LER Notation for ccsd_onesize.cpp
+
+F_org:
+	Σa∫0,V∫ Σb∫0,V∫ Σc∫0,V∫ Σi∫0,O∫ Σj∫0,O∫ Σk∫0,O∫ Σe∫0,V∫ Σm∫0,O∫

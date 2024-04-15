@@ -53,7 +53,6 @@ double t_start, t_end;
 
 int main() {
   int i, j, k;
-  register double s;
 
   init_array();
 

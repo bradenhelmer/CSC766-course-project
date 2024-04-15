@@ -69,7 +69,7 @@ double rtclock() {
 double t_start, t_end;
 
 // example4
-void example4() {
+double example4() {
   for (int k = 2; k < zn - 1; k++) {
     double zi = ((double)(k - 1)) / zn;
     for (int j = 2; j < yn - 1; j++) {

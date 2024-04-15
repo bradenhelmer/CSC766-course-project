@@ -88,6 +88,6 @@ int main() {
   IF_TIME(t_end = rtclock());
   IF_TIME(printf("time %0.6lfs\n", t_end - t_start));
 
-  printf("result=%f\n", rst_org);
+  printf("result: %f\n", rst_org);
   return 0;
 }
