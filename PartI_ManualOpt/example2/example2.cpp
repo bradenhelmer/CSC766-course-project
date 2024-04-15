@@ -16,20 +16,19 @@
  * =====================================================================================
  */
 
-
+#include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include <unistd.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 typedef long LARGE_INTEGER;
 
 #define m 10000
 #define NOiteration 10000
 #define w0 1
-double r = 1/m; 
+double r = 1 / m;
 double a[m];
 double b[m];
 
@@ -41,64 +40,61 @@ double b[m];
 #define IF_TIME(foo)
 #endif
 
-//array initialization
-void init_array()
-{
+// array initialization
+void init_array() {
   int i, j;
 
-  for (i=0; i<m; i++) {
-    a[i] = 1/i;
+  for (i = 0; i < m; i++) {
+    a[i] = 1 / i;
   }
-  for (i=0; i<m; i++) {
-    b[i] = 1/i;
+  for (i = 0; i < m; i++) {
+    b[i] = 1 / i;
   }
 }
 
-
-//define timer for performance measurement
-double rtclock()
-{
+// define timer for performance measurement
+double rtclock() {
   struct timezone Tzp;
   struct timeval Tp;
   int stat;
-  stat = gettimeofday (&Tp, &Tzp);
-  if (stat != 0) printf("Error return from gettimeofday: %d",stat);
-  return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
+  stat = gettimeofday(&Tp, &Tzp);
+  if (stat != 0)
+    printf("Error return from gettimeofday: %d", stat);
+  return (Tp.tv_sec + Tp.tv_usec * 1.0e-6);
 }
 double t_start, t_end;
 
-
-//example2
-double example2(){
+// example2
+double example2() {
   double w = w0;
   int iteration = 0;
   double d;
-  while(true){
+  while (true) {
     d = 0;
-    for (int i = 0; i < m; i++){
+    for (int i = 0; i < m; i++) {
       d += a[i] + b[i] * w;
     }
     iteration++;
-    if(iteration >= NOiteration) break;
-    //if(d < 0.0001) break;
-    w = w + r*d;
+    if (iteration >= NOiteration)
+      break;
+    // if(d < 0.0001) break;
+    w = w + r * d;
   }
   return w;
 }
 
-int main()
-{
+int main() {
   int i, j, k;
-  int runiter  =  10000/NOiteration;
-  if(runiter < 1)
-    runiter  = 1;
+  int runiter = 10000 / NOiteration;
+  if (runiter < 1)
+    runiter = 1;
   init_array();
-  
+
   IF_TIME(t_start = rtclock());
 
   double rst_org, rst_opt;
-  
-  for(int inter = 0; inter < runiter; inter++){
+
+  for (int inter = 0; inter < runiter; inter++) {
     rst_org = example2();
   }
   IF_TIME(t_end = rtclock());
@@ -107,4 +103,3 @@ int main()
   printf("result: %f\n", rst_org);
   return 0;
 }
-

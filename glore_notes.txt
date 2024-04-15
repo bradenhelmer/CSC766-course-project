@@ -1,0 +1,115 @@
+LER Notation Overview
+---------------------
+
+Form : L E -> R
+	L -> Sequence of loop notations
+	E -> An expression inside of loops L
+	R -> Computation results stored in R
+
+E & Operands Folding
+--------------------
+- Expression E may contain arbitrary mathematical operations like sin(x), cos(x),
+  as long as they do not incur any side effects.
+- Operands folding - Computations using operations beyond the basic operators
+  (+ - * /), the computations are folded into a single synthetic operand with
+  all enclosing loop indices e.g
+  	sin(a[i] + b[j]) -> sythetic_ab1[i, j]
+
+L & Dependence Subscripts
+-------------------------
+- L is a combination of Γ, Σ, Π, Ψ for representing different kinds of loops
+
+   l,u
+- Γ    is for regular for loops, with loop index var i, assuming normalization with 
+   i   a lower(l) and upper(u) bound which are affine expressions of loop index
+       variables with 1 as the step size.
+             1,N  1,M
+	   e.g  Γ    Γ    (a[i] * b[i] * c[j]) ---> x[i, j]  
+             i    j  
+
+		the code for the above sequence is:
+		for(i = 1; i ≤ n; i++){
+			for(j = 1; j ≤ m; j++){
+				x[i,j] = a[i] · b[i] · c[j];}}
+
+- Σ, Π are for reduction loops - summation | product across iterations. The
+  notation for these loops are the same as the GAMMA symbol for the regular for loops.
+	
+                1,N  1,M
+	   e.g b + Γ    Γ    a[i] ---> x
+                i    j  
+
+		the code for the above sequence is:
+		x = b;
+		for(i = 1; i ≤ n; i++){
+			for(j = 1; j ≤ m; j++){
+				x = x + a[i];}}
+
+- Ψ  is for represeting while loops and other irregular loops. There are no loop
+   t index varibles, so the subscript t is used to identify such loop. This notation is
+     also used to represent irregular for/reduction loops - mainly those that
+	 are non-affine or contain controlflow/break statements.
+
+
+Anlysis and Optimizations
+-------------------------
+
+GLORE Algorithm:
+1. Input set of LER notation corresponding to some nested loop -> F_ORG
+
+2. Formulae Preprocessing -> F_ALT
+	1. Operand folding - replace basic algorithmic operations
+	   with synthetic operands.
+
+	2. Alternating form generation - minus is turned into negative signs
+	   associated with each of the relevant operands and division is
+	   folded into operands as inverse. This way, the formula only contains
+	   plus and times operations, represented in a tree heirarchy with the 
+	   levels alternating as + and *. See fig 5. in paper.
+
+3. Optimization Steps
+	1. Operand Abstraction - replace each index of each operand with a set
+	   of the IDs of its relevant loops. Denoted by relLoops(x) for operand x
+	   e.g x[i + j] ---> x {i, j} & y[i,j+k] ---> y{i,j,k}
+
+	   This changes the formulae into the form f*
+		
+	2. Loop Ecapsulation - f' Through pseudo-bounds, hide the complexities in
+	   loop bounds such that every loop in f' other than while loops has only
+	   constant bounds. Use a minimum union algorithm to detect and remove cat-3
+	   redundancies (loop-invariant loops) from f'. -> G
+
+	3. For each formula g in G, decapsulate into a form g' with the complexities of
+	   the loop bounds restored. Then, find and remove cat-4 redundancies
+	   (partially loop-invariant loops) by converting g' into an incremental
+	   representation resulting in new formulae H.
+
+	4. Operand concretization - restore concrete index expressions of operands, and
+	   removing cat-1 and cat-2 redundancies with reuse lists/groups.
+	
+
+Category 3 - Loop-Invariant loops removal
+-----------------------------------------
+- Can be a reduction loop or for loop.
+- First case assume no loop-carried data dependencies and all loops are interchangeable
+  in order of exectuion.
+	- For loop-invariant reduction loops:
+		1. Based on relLoops of operands and relLoops of reduction loops.
+		2. The relLoops of a reduction loop R is the union of the relLoops
+		   of all of its operands whose relLoops contains R:
+
+		   relLoops(R) =       ∪   			RelLoops(o)
+		   				o:o ∈ operands(R)
+						R ∈ relLoops(o)
+		see formula 6 for details
+	- Formula Simplification / Detecting Redundancy - See page 10-11
+
+- Minimum Union Algorithm - heuristical page 12-13
+	- if relLoops(Loop_i) is a subset of relLoops(loop_j) and j does
+	  not include j, computing loop i first will allow loop j to use its
+	  results.
+	- If relLoops of two reduction loops i and j have no overlap, then the
+	  2 reduction loops do not need to use the results from eachother and
+	  hence the order of them does not matter.
+
+- Closure-based algorithm for loop-invariant regular loops.
