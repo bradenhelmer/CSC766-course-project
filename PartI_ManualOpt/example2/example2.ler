@@ -1,0 +1,21 @@
+LER Notation for example2.cpp : example2() function
+
+F_org:
+   Ψ$t$ Σi∫0,n∫ (a[i] + b[i] * w$t$) = d$t$
+
+f*:
+   Ψ$t$ Σi∫0,n∫ (a{i} + b{i} * w$t$) = d$t$
+
+G:
+   Σi∫0,n∫ a{i} = tmp1
+
+   Σi∫0,n∫ b{i} = tmp1
+
+   Ψ$t$ (tmp1 + tmp2 * w{t}) = d$t$
+
+Optimized h':
+   Σi∫0,n∫ a[i] = tmp1
+                                    
+   Σi∫0,n∫ b[i] = tmp1
+                                    
+   Ψ$t$ (tmp1 + tmp2 * w$t$) = d$t$

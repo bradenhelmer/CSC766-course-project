@@ -1,0 +1,9 @@
+LER Notation for example1.cpp : example1() function
+
+F_org:
+	Γi∫0,m∫ Πj∫0,m∫ Γk∫0,n∫ Πl∫0,n∫ x[i,l] * y[l, j] * s[j, k] = r[i, k]
+
+Optimized h': 
+   Γl∫0,n∫ Γk∫0,n∫ Πj∫0,m∫ y[l, j] * s[j, k] = temp[l, k]
+
+   Γi∫0,m∫ Γk∫0,n∫ Πl∫0,n∫ x[i, l] * temp[l, k] = r[i, k]
