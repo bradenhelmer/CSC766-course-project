@@ -30,6 +30,7 @@ public class Glory {
             ParseTreeWalker walker = new ParseTreeWalker();
             DirectiveListener listener = new DirectiveListener();
             walker.walk(listener, drinkSentenceContext);
+
         } catch (Exception e) {
             System.out.println("Invalid Input");
         }

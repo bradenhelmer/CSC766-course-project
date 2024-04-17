@@ -1,0 +1,19 @@
+plugins {
+	id 'java'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.antlr:antlr4-runtime:4.13.1'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs 'LER'
+		}
+	}
+}

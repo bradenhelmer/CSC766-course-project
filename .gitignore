@@ -1,3 +1,8 @@
 PartII_AutoOpt/LER/*.class
 PartII_AutoOpt/testResult/
+PartII_AutoOpt/.gradle
+PartII_AutoOpt/build
+PartII_AutoOpt/.settings
+PartII_AutoOpt/.project
+PartII_AutoOpt/.classpath
 *.pdf
