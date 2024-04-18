@@ -13,27 +13,27 @@ public class Glory {
 				new FileInputStream(args[0]));
 
 		// try {
-			// Get our lexer
-			GloryLexer lexer = new GloryLexer(inputStream);
-			// Get a list of matched tokens
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
+		// Get our lexer
+		GloryLexer lexer = new GloryLexer(inputStream);
+		// Get a list of matched tokens
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-			// Pass the tokens to the parsercatcat
-			GloryParser parser = new GloryParser(tokens);
+		// Pass the tokens to the parsercatcat
+		GloryParser parser = new GloryParser(tokens);
 
-			// Specify our entry point
-			GloryParser.StatementContext drinkSentenceContext = parser.statement();
-			ParseTreeWalker walker = new ParseTreeWalker();
-			LERListener lerListener = new LERListener();
-			walker.walk(lerListener, drinkSentenceContext);
-			// DirectiveListener listener = new DirectiveListener();
-			// walker.walk(listener, drinkSentenceContext);
-			
-			LER ler = lerListener.exportLER();
-			ler.output();
+		// Specify our entry point
+		GloryParser.StatementContext drinkSentenceContext = parser.statement();
+		ParseTreeWalker walker = new ParseTreeWalker();
+		LERListener lerListener = new LERListener();
+		walker.walk(lerListener, drinkSentenceContext);
+		// DirectiveListener listener = new DirectiveListener();
+		// walker.walk(listener, drinkSentenceContext);
+
+		LER ler = lerListener.exportLER();
+		ler.output();
 
 		// } catch (Exception e) {
-		// 	System.out.println("Invalid Input");
+		// System.out.println("Invalid Input");
 		// }
 	}
 

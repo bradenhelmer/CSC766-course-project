@@ -1,10 +1,7 @@
 # Makefile for LER Optimizer
 COMPILER := javac
 LER_DIR := LER
-SOURCE := $(wildcard $(LER_DIR)/Glory*.java)
-SOURCE += $(LER_DIR)/DirectiveListener.java
-SOURCE += $(LER_DIR)/LER*.java
-SOURCE += $(LER_DIR)/*Loop.java
+SOURCE := $(wildcard $(LER_DIR)/*.java)
 PYTHON := python3
 
 compile: $(SOURCE)
@@ -14,4 +11,4 @@ clean:
 	rm $(LER_DIR)/*.class testResult/*
 
 test: compile
-	$(PYTHON) runAllTestCases.py
+	java --class-path="./LER:$$CLASSPATH" Glory testcases/case3.4.txt

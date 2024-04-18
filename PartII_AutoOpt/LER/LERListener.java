@@ -4,9 +4,15 @@ import java.text.ParseException;
 
 public class LERListener extends GloryBaseListener {
 
+	// Type of loop we are currently parsing
 	private int currLoopType;
+
+	// Parsing flags
 	private boolean isParsingLoop = false;
 	private boolean readyToExport = false;
+	private boolean hasFoundR = false;
+
+	// LER representation to be exported after.
 	private LER ler;
 
 	public LERListener() {
@@ -92,5 +98,52 @@ public class LERListener extends GloryBaseListener {
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void enterE(GloryParser.EContext ctx) {
+		__parseOpsAndOperands(ctx.getText());
+	}
+
+	private boolean __isOp(char c) {
+		return c == '+' || c == '-' || c == '/' || c == '*';
+	}
+
+	// Internal function to parse the expression string,
+	// retreiving concrete ops and operands from the ANTLR
+	// methods proved recursively difficult.
+	private void __parseOpsAndOperands(String E) {
+		StringBuilder sb = new StringBuilder();
+		char arr[] = E.toCharArray();
+		for (int i = 0; i < E.length(); i++) {
+			sb.delete(0, sb.length());
+			if (arr[i] == '(') {
+				while (arr[i] != ')' && i < E.length()) {
+					sb.append(arr[i++]);
+				}
+				sb.append(arr[i]);
+				ler.addOperand(sb.toString());
+				continue;
+			}
+
+			while (!__isOp(arr[i])) {
+				sb.append(arr[i++]);
+				if (i == E.length())
+					break;
+			}
+
+			if (sb.length() != 0) {
+				ler.addOperand(sb.toString());
+			}
+
+			if (i != E.length()) {
+				ler.addOp(Character.toString(arr[i]));
+			}
+		}
+	}
+
+	@Override
+	public void enterR(GloryParser.RContext ctx) {
+		ler.setResult(ctx.getText());
 	}
 }
