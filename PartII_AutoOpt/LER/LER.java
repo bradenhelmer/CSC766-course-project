@@ -22,6 +22,7 @@ public class LER {
 	// Result operand LE -> R
 	private String result;
 
+	// CTOR
 	public LER() {
 		this.loops = new LinkedList<Loop>();
 		this.operands = new LinkedList<Operand>();
@@ -29,10 +30,7 @@ public class LER {
 		this.iterVars = new LinkedHashSet<String>();
 	}
 
-	public void optimize() {
-		abstractOperands();
-	}
-
+	// SETTERS ... 
 	public void addLoop(Loop L) {
 		if (L instanceof ForLoop FL) {
 			iterVars.add(FL.getIter());
@@ -48,6 +46,11 @@ public class LER {
 		operands.add(new Operand(O));
 	}
 
+	public void setResult(String R) {
+		result = R;
+	}
+
+	// OUTPUT
 	public void output(boolean abstracted) {
 		int indent = 0;
 		for (Loop L : loops) {
@@ -67,12 +70,13 @@ public class LER {
 		System.out.println();
 	}
 
-	public void setResult(String R) {
-		result = R;
+	// OPTIMIZATION METHODS
+	public void optimize() {
+		abstractOperands();
 	}
 
 	// Performs operand abstraction, computing relLoops(x) for each operand.
-	public void abstractOperands() {
+	private void abstractOperands() {
 		operands.forEach(O -> {
 			if (!iterVars.isEmpty())
 				O.selfAbstract(iterVars);
