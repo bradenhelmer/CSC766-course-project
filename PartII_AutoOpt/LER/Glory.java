@@ -30,7 +30,8 @@ public class Glory {
 		// walker.walk(listener, drinkSentenceContext);
 
 		LER ler = lerListener.exportLER();
-		ler.output();
+		GLORE.optimize(ler);
+		ler.output(true);
 
 		// } catch (Exception e) {
 		// System.out.println("Invalid Input");
