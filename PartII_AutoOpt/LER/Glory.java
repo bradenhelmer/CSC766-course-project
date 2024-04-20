@@ -30,7 +30,10 @@ public class Glory {
 		// walker.walk(listener, drinkSentenceContext);
 
 		LER ler = lerListener.exportLER();
-		GLORE.optimize(ler);
+		ler.optimize();
+		System.out.println("Original:");
+		ler.output(false);
+		System.out.println("\nOperands Abstracted:");
 		ler.output(true);
 
 		// } catch (Exception e) {

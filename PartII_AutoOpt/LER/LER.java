@@ -29,6 +29,10 @@ public class LER {
 		this.iterVars = new LinkedHashSet<String>();
 	}
 
+	public void optimize() {
+		abstractOperands();
+	}
+
 	public void addLoop(Loop L) {
 		if (L instanceof ForLoop FL) {
 			iterVars.add(FL.getIter());
@@ -52,6 +56,7 @@ public class LER {
 		}
 		int i;
 		System.out.print(" ".repeat(2 * indent++));
+		System.out.printf("%s = ", result);
 		for (i = 0; i < operands.size(); ++i) {
 			Operand O = operands.get(i);
 			System.out.printf("%s ", abstracted ? O.getAbstracted() : O.getRaw());
@@ -59,7 +64,7 @@ public class LER {
 				System.out.printf("%s ", ops.get(i));
 			}
 		}
-		System.out.printf("= %s\n", result);
+		System.out.println();
 	}
 
 	public void setResult(String R) {
