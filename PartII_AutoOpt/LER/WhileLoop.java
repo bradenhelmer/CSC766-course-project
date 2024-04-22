@@ -1,4 +1,6 @@
 // While loop Abstraction
+import java.util.Set;
+import java.util.HashSet;
 
 public class WhileLoop implements LER.Loop {
 
@@ -23,4 +25,9 @@ public class WhileLoop implements LER.Loop {
 	public void print() {
 		System.out.printf("WHILE LOOP (%s)\n", subscript);
 	}
+
+	public Set<String> getRelLoops() {
+        Set<String> relLoops = new HashSet<>();
+		return relLoops;
+    }
 }
