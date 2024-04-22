@@ -35,10 +35,10 @@ public class Glory {
 		ler.output(false);
 		System.out.println("\nOperands Abstracted:");
 		ler.output(true);
-
-		// } catch (Exception e) {
-		// System.out.println("Invalid Input");
-		// }
+		ler.setRelLoopsForForLoops();
+		ler.minUnion();
+        
+        
 	}
 
 }
