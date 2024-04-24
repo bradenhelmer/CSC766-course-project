@@ -53,7 +53,7 @@ int main() {
   // #pragma endscop
 
   IF_TIME(t_end = rtclock());
-  IF_TIME(fprintf(stdout, "%0.6lfs\n", t_end - t_start));
+  IF_TIME(fprintf(stdout, "time %0.6lfs\n", t_end - t_start));
 
   double rst_org = b[N - 1][N - 1];
 
