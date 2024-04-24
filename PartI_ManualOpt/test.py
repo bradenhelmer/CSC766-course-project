@@ -41,4 +41,4 @@ if __name__ == "__main__":
     plt.title("Program speedups after LER Optimization")
     plt.xticks(rotation=45)
     plt.tight_layout()
-    plt.show()
+    plt.savefig("compare.png")
