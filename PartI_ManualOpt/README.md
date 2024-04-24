@@ -7,7 +7,8 @@ This directory contains all the files related to part I of the course project, m
 
 ### Testing
 For building and testing the programs:
-```
+```bash
+sudo apt install pip
 pip3 install matplotlib
 python3 test.py
 ```
