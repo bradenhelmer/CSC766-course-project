@@ -76,9 +76,9 @@ int main() {
 
   init_array();
 
-  // original code
   IF_TIME(t_start = rtclock());
 
+  // Optimized code
 #pragma scop
   int a, b, c, e, i, j, k, m;
   for (a = 0; a < V; a++)
@@ -88,8 +88,7 @@ int main() {
           for (j = 0; j < O; j++)
             for (k = 0; k < O; k++)
               for (e = 0; e < V; e++)
-                for (m = 0; m < 1000; m++) // checkhere
-                  X[a][b][c][i][j][k] += T2[c][e][i][j] * O2[a][b][e][k];
+                  X[a][b][c][i][j][k] += T2[c][e][i][j] * O2[a][b][e][k] * 1000;
 #pragma endscop
 
   IF_TIME(t_end = rtclock());

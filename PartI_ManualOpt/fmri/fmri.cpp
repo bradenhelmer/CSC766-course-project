@@ -6,10 +6,10 @@
 #include <unistd.h>
 
 #define N 10000
-double a[N];
-double b[N];
-double c[N];
-double temp[N];
+int64_t a[N];
+int64_t b[N];
+int64_t c[N];
+int64_t temp[N];
 
 #define TIME
 #ifdef TIME
@@ -33,7 +33,7 @@ void print_array() {
   int i, j;
 
   for (i = 0; i < N; i++) {
-    fprintf(stderr, "%lf ", a[i]);
+    fprintf(stderr, "%lu ", a[i]);
     if (j % 80 == 79)
       fprintf(stderr, "\n");
   }
@@ -71,7 +71,7 @@ int main() {
     }
   }
 #pragma endscop
-  double rst_org = a[N - 1];
+  int64_t rst_org = a[N - 1];
 
   IF_TIME(t_end = rtclock());
   IF_TIME(printf("time %0.6lfs\n", t_end - t_start));
@@ -79,6 +79,6 @@ int main() {
 #ifdef TEST
   print_array();
 #endif
-  printf("result: %f\n", rst_org);
+  printf("result: %lu\n", rst_org);
   return 0;
 }

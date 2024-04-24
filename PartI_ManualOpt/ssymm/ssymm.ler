@@ -1,0 +1,11 @@
+LER Notation for ssymm.cpp line: 47
+
+Original:
+Γiter∫0,internumber∫ Σi∫0,NMAX∫ Σj∫0,NMAX∫ Σk∫0,j - 1∫ c[i][k] + (a[j][k] * b[i][j]) = c[i][k]
+Γiter∫0,internumber∫ Σi∫0,NMAX∫ Σj∫0,NMAX∫ Σk∫0,j - 1∫ c[i][j] + (a[j][j] * b[i][j]) = c[i][j]
+Γiter∫0,internumber∫ Σi∫0,NMAX∫ Σj∫0,NMAX∫ c[i][j] + (a[j][j] * b[i][j]) = c[i][j]
+
+Optimized:
+Σi∫0,NMAX∫ Σj∫0,NMAX∫ Σk∫0,j - 1∫ c[i][k] + (a[j][k] * b[i][j]) * internumber= c[i][k]
+Σi∫0,NMAX∫ Σj∫0,NMAX∫ Σk∫0,j - 1∫ c[i][j] + (a[j][j] * b[i][j]) * internumber = c[i][j]
+Σi∫0,NMAX∫ Σj∫0,NMAX∫ c[i][j] + (a[j][j] * b[i][j]) * internumber = c[i][j]

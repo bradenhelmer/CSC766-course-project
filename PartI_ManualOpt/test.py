@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 import os
+import subprocess
+import matplotlib.pyplot as plt
 
 COMPILER = "gcc"
 
@@ -7,7 +9,7 @@ data = {}
 
 if __name__ == "__main__":
     for test_dir in os.listdir("."):
-        if os.path.isdir(test_dir) and test_dir != "priv2":
+        if os.path.isdir(test_dir):
             os.chdir(test_dir)
             print(f"Compiling {test_dir}...")
             os.system(f"{COMPILER} -O3 -msse {test_dir}.cpp -o {test_dir}.out")

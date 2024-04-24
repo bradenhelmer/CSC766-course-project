@@ -73,23 +73,27 @@ double example5() {
     w[j] = 0;
   }
 
+  double temp1 = 0;
+  for (int i = 0; i < M; i++) {
+	for (int j = 0; j < D; j++) {
+	  temp1 += x[i][j];
+	}
+  }
+
+  // Optimized
   for (int k = 0; k < NOiteration; k++) {
-    // prepare for reduction on array d[j]
+
+	double s = 0;
     for (int j = 0; j < D; j++) {
       d[j] = 0;
+	  s = s + temp1 * w[j];
     }
-    for (int i = 0; i < M; i++) {
-      double s = 0;
-      for (int j = 0; j < D; j++) {
-        s = s + x[i][j] * w[j];
-      }
-      for (int j = 0; j < D; j++) {
-        d[j] = d[j] + s * x[i][j];
-      }
-    }
-    for (int j = 0; j < D; j++) {
-      w[j] = w[j] + r * d[j];
-    }
+
+	for (int j = 0; j < D; j++) {
+	  d[j] = d[j] + s * temp1;
+	  w[j] = w[j] + r * d[j];
+	}
+
   }
   return w[D - 1];
 }

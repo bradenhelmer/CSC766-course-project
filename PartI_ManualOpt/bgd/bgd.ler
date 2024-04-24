@@ -1,0 +1,14 @@
+LER notation for main loop in bgd.cpp Line 76
+
+Original:
+Γk∫0,NOiteration∫ Γj∫0,D∫ 0 = d[j]
+Γk∫0,NOiteration∫ Σi∫0,M∫ Πj∫0,D∫ s + x[i,j] * w[j] = s
+Γk∫0,NOiteration∫ Πi∫0,M∫ Πj∫0,D∫ d[j] + s * x[i,j] = d[j]
+Γk∫0,NOiteration∫ Πj∫0,D∫ w[j] + r * d[j] = w[j]
+
+Optimized:
+Γk∫0,NOiteration∫ 0 = s
+Γk∫0,NOiteration∫ Γj∫0,D∫ 0 = d[j]
+Γk∫0,NOiteration∫ Πj∫0,D∫ s + x[i,j] * w[j] = s
+Γk∫0,NOiteration∫ Σj∫0,D∫ d[j] + s * x[i,j] = d[j]
+Γk∫0,NOiteration∫ Πj∫0,D∫ w[j] + r * d[j] = w[j]

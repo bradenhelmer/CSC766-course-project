@@ -5,7 +5,7 @@
 
 #define N 1000
 
-double a[N];
+double a[19900];
 double b[N][N];
 
 #define TIME 1
@@ -31,27 +31,23 @@ int main() {
   double t_start, t_end;
 
   for (i = 0; i < N; i++) {
-    a[i] = i;
     for (j = 0; j < N; j++) {
+	  a[10 * i + j] = i;
       b[i][j] = i * j;
     }
   }
   double dist, dist1;
 
-  // orignial
+  // Optimized
   IF_TIME(t_start = rtclock());
 
   // #pragma scop
   for (i = 0; i < N; i++) {
     for (j = 0; j < N; j++) {
-      dist = 0.0;
-      dist1 = 0.0;
-      for (k = 0; k < N; k++) {
-        dist += a[10 * i + j] * a[10 * i + j];
-        dist1 += a[10 * i + j] + a[10 * i + j];
-      }
-      b[i][j] = dist;
-      b[i][j] += dist1;
+	  double temp1 = a[10 * i + j] * a[10 * i + j];
+	  double temp2 = a[10 * i + j] + a[10 * i + j];
+      b[i][j] = temp1 * N;
+      b[i][j] += temp2 * N;
     }
   }
   // #pragma endscop
