@@ -21,6 +21,11 @@ public class Operand {
 		return raw;
 	}
 
+	@Override
+	public String toString() {
+		return raw;
+	}
+
 	public String getAbstracted() {
 		if (relLoops.isEmpty()) {
 			return raw;
@@ -61,6 +66,10 @@ public class Operand {
 			if (access.contains(iterVar))
 				relLoops.add(iterVar);
 		}
+	}
+
+	public Set<String> getRelLoops() {
+		return relLoops;
 	}
 
 }

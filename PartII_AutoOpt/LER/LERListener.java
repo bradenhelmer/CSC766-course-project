@@ -14,6 +14,7 @@ public class LERListener extends GloryBaseListener {
 
 	// LER representation to be exported after.
 	private LER ler;
+	private LER.Loop currentLoop;
 
 	public LERListener() {
 		this.ler = new LER();
@@ -45,6 +46,13 @@ public class LERListener extends GloryBaseListener {
 		isParsingLoop = true;
 	}
 
+	@Override
+	public void enterConditionExpression(GloryParser.ConditionExpressionContext ctx) {
+		if (currentLoop instanceof WhileLoop WL) {
+			WL.setCondE(ctx.getText());
+		}
+	}
+
 	// Internal enterForParam call
 	private void __enterForParam(GloryParser.ForParamContext ctx) throws ParseException {
 		if (!GloryUtil.isForType(currLoopType)) {
@@ -53,6 +61,7 @@ public class LERListener extends GloryBaseListener {
 			try {
 				ForLoop loop = new ForLoop(ctx.id().getText(), ctx.lBound().getText(),
 						ctx.uBound().getText(), currLoopType);
+				currentLoop = loop;
 				ler.addLoop(loop);
 			} catch (IllegalArgumentException e) {
 				System.err.println(e.getMessage());
@@ -75,6 +84,7 @@ public class LERListener extends GloryBaseListener {
 	public void enterSubscript(GloryParser.SubscriptContext ctx) {
 		if (GloryUtil.isWhileType(currLoopType) && isParsingLoop) {
 			WhileLoop loop = new WhileLoop(__getIdFromSubscript(ctx.getText()));
+			currentLoop = loop;
 			ler.addLoop(loop);
 			isParsingLoop = false;
 		} else {
@@ -102,6 +112,7 @@ public class LERListener extends GloryBaseListener {
 
 	@Override
 	public void enterE(GloryParser.EContext ctx) {
+		ler.setE(ctx.getText());
 		__parseOpsAndOperands(ctx.getText());
 	}
 

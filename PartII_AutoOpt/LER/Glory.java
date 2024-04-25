@@ -32,9 +32,11 @@ public class Glory {
 		LER ler = lerListener.exportLER();
 		ler.optimize();
 		System.out.println("Original:");
-		ler.output(false);
+		ler.outputPseudo(false);
 		System.out.println("\nOperands Abstracted:");
-		ler.output(true);
+		ler.outputPseudo(true);
+		System.out.println("\nLER:");
+		ler.outputLER();
 
 		// } catch (Exception e) {
 		// System.out.println("Invalid Input");

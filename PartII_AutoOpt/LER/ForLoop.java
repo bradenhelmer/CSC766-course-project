@@ -21,6 +21,11 @@ public class ForLoop implements LER.Loop {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return String.format("%s∫%s,%s∫", GloryUtil.getLoopSymbol(type), lb, ub);
+	}
+
 	public void print() {
 		System.out.printf("%s FOR LOOP (%s) %s -> %s\n", GloryUtil.getGloryTokenString(type), iter, lb, ub);
 	}

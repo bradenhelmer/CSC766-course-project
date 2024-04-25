@@ -14,4 +14,20 @@ public class GloryUtil {
 	public static boolean isWhileType(int tokenType) {
 		return tokenType == GloryParser.OTHER;
 	}
+
+	public static String getLoopSymbol(int tokenType) {
+		switch (tokenType) {
+			case GloryParser.NORMAL:
+				return "Γ";
+			case GloryParser.OTHER:
+				return "Ψ";
+			case GloryParser.PRODUCT:
+				return "Π";
+			case GloryParser.SUMMATION:
+				return "Σ";
+		}
+
+		return "";
+	}
+
 }

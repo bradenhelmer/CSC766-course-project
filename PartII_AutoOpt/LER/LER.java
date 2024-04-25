@@ -2,6 +2,8 @@
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LER {
 
@@ -16,11 +18,15 @@ public class LER {
 	private LinkedHashSet<String> iterVars;
 
 	// Expression -> E
+	private String rawE;
 	private LinkedList<Operand> operands;
 	private LinkedList<String> ops;
 
 	// Result operand LE -> R
 	private String result;
+
+	// Holds the potential multiple LER statements after optimization.
+	private List<LER> optimized;
 
 	// CTOR
 	public LER() {
@@ -28,9 +34,10 @@ public class LER {
 		this.operands = new LinkedList<Operand>();
 		this.ops = new LinkedList<String>();
 		this.iterVars = new LinkedHashSet<String>();
+		this.optimized = new LinkedList<LER>();
 	}
 
-	// SETTERS ... 
+	// SETTERS ...
 	public void addLoop(Loop L) {
 		if (L instanceof ForLoop FL) {
 			iterVars.add(FL.getIter());
@@ -50,8 +57,26 @@ public class LER {
 		result = R;
 	}
 
-	// OUTPUT
-	public void output(boolean abstracted) {
+	public void setE(String E) {
+		rawE = E;
+	}
+
+	// OUTPUT Methods
+	
+	// LER String representation.
+	@Override
+	public String toString() {
+		String output = "";
+		for (Loop L : loops) {
+			output += L.toString();
+		}	
+		output += rawE + "=" + result;
+		return output;
+	}
+
+
+	// Output pseudo code for loops.
+	public void outputPseudo(boolean abstracted) {
 		int indent = 0;
 		for (Loop L : loops) {
 			System.out.print(" ".repeat(2 * indent++));
@@ -70,9 +95,49 @@ public class LER {
 		System.out.println();
 	}
 
+	// Output LER Noation
+	public void outputLER() {
+		if (optimized.isEmpty()) {
+			System.out.println(this.toString());
+		} else {
+			for (LER L : optimized) {
+				System.out.println(L.toString());
+			}
+		}
+	}
+
+	private void cat4Removal() {
+		// Iterate backwards from inner to outer loops.
+		ArrayList<Operand> toBeMoved;
+		ArrayList<Operand> stayingPut = new ArrayList<Operand>();
+		int tempCount = 0;
+
+		for (int i = loops.size() - 1; i >= 0; --i) {
+			toBeMoved = new ArrayList<Operand>();
+			Loop L = loops.get(i);
+			if (L instanceof ForLoop FL) {
+				for (Operand O : operands) {
+					// We need to check here that we havent already looked at an operand.
+					if (!O.getRelLoops().contains(FL.getIter()) && !stayingPut.contains(O))
+						toBeMoved.add(O);
+					else
+						stayingPut.add(O);
+
+				}
+			}
+
+			// Check we have a variable to remove here.
+			if (!toBeMoved.isEmpty()) {
+				String tempVar = String.format("temp%d", tempCount++);
+				operands.removeAll(toBeMoved);
+			}
+		}
+	}
+
 	// OPTIMIZATION METHODS
 	public void optimize() {
 		abstractOperands();
+		cat4Removal();
 	}
 
 	// Performs operand abstraction, computing relLoops(x) for each operand.
