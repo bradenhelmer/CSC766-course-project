@@ -10,7 +10,7 @@ public class ForLoop implements LER.Loop {
 	private int type;
 	private int step = 1;
 	private String ID;
-    private double cost;
+    private int cost;
     private Set<String> relLoops;
     private Set<ForLoop> children;
     private ForLoop parent;
@@ -94,12 +94,14 @@ public class ForLoop implements LER.Loop {
 	}
     
     
-    public double getCost() {
+    public int getCost() {
+		System.out.print(cost);
         return cost;
     }
     
-    public void setCost(double cost) {
-        this.cost = cost;
+    public void setCost(int cost) {
+		this.cost = cost;
+		//System.out.println("setCost: " + this.cost); 
     }
     
     public Set<String> getRelLoops() {
@@ -126,11 +128,25 @@ public class ForLoop implements LER.Loop {
     public void setParent(ForLoop parent) {
         this.parent = parent;
     }
-    
+    public Integer tryParseInt(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch (NumberFormatException e) {
+			// If the string cannot be parsed as an integer, return null
+			return null;
+		}
+	}
     public int getIndexRange() {
-        int lowerBound = Integer.parseInt(lb);
-		int upperBound = Integer.parseInt(ub);
-		return upperBound - lowerBound + 1;
+		Integer lbVal = tryParseInt(lb);
+		Integer ubVal = tryParseInt(ub);
+		if (lbVal != null && ubVal != null) {
+			int lowerBound = Integer.parseInt(lb);
+			int upperBound = Integer.parseInt(ub);
+			return upperBound - lowerBound + 1;
+		} else {
+			return 1;
+		}
+        
     }
     
     public void setIndexRange(int indexRange) {

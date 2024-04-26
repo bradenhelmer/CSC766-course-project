@@ -157,25 +157,25 @@ public class LER {
 
 	public void setRelLoopsForForLoops() {
 		for (Operand operand : operands) {
-			Set<String> relLoops = operand.selfAbstract(iterVars); // Assuming selfAbstract returns the relevant loops
+			Set<String> relLoops = operand.selfAbstract(iterVars); 
 			for (Loop loop : loops) {
 				if (loop instanceof ForLoop) {
 					ForLoop forLoop = (ForLoop) loop;
 					if (relLoops.contains(forLoop.getIter())) {
-						forLoop.setRelLoops(relLoops); // Set the relLoops for this ForLoop
+						forLoop.setRelLoops(relLoops); 
 					}
 				}
 			}
 		}
 	}
 	
-	
-	
+		
 	public LinkedList getLoops() {
 		return this.loops;
 	}
 	
 	private boolean isSubset(Set<String> set1, Set<String> set2) {
+		boolean t = set2.containsAll(set1);
 		return set2.containsAll(set1);
 	}
 	
@@ -184,8 +184,10 @@ public class LER {
 		for (Loop node : S) {
 			
 			if (node instanceof ForLoop) {
-				
-				initialNodes.add((ForLoop) node);
+				ForLoop forLoop = (ForLoop) node;
+				if(forLoop.getType()== 23 || forLoop.getType() == 24){//check to be reduction loop
+					initialNodes.add((ForLoop) forLoop);
+				}
 			}
 		}
 		return initialNodes;
@@ -193,93 +195,77 @@ public class LER {
 	
 	
     public ForLoop findMinimumCostLoop(Set<ForLoop> worklist) {
-        ForLoop minLoop = null;
-        double minCost = Double.MAX_VALUE;
-        for (ForLoop loop : worklist) {
-            if (((ForLoop) loop).getCost() < minCost) {
-                minLoop = loop;
-                minCost = ((ForLoop) loop).getCost();
-            }
-        }
-		
-        return minLoop;
+		int min = Integer.MAX_VALUE;
+		ForLoop minLoop = null;
+
+		for (ForLoop loop : worklist) {
+			minLoop = (ForLoop) loop;
+			min = Math.min(min, minLoop.getCost());
+			
+		}	
+		return minLoop;
     }
 
-	public void calculateCost() {
-		// Iterate over each reduction loop
-		for (Loop loop : loops) {
-			if (loop instanceof ForLoop) {
-				ForLoop forLoop = (ForLoop) loop;
-				double minCost = Double.MAX_VALUE;
-				
-				// Iterate over each other reduction loop to calculate cost
-				for (Loop otherLoop : loops) {
-					if (loop != otherLoop && otherLoop instanceof ForLoop) {
-						ForLoop otherForLoop = (ForLoop) otherLoop;
-						Set<String> relLoops = forLoop.getRelLoops();
-						Set<String> otherRelLoops = otherForLoop.getRelLoops();
-						System.out.printf("relLoops %s", relLoops);
-						System.out.printf("otherRelLoops %s", otherRelLoops);
-						if (isSubset(relLoops, otherRelLoops) && !otherRelLoops.containsAll(relLoops)) {
-							// Compute cost based on the subset condition
-							double cost = computeCost(forLoop, otherForLoop);
-							minCost = Math.min(minCost, cost);
-						}
-					}
-				}
-				
-				// Set the minimum cost for the loop
-				forLoop.setCost(minCost);
+	public void calculateCost(Set<ForLoop> worklist) {
+		
+		for (ForLoop loop : worklist) {
+			
+			
+			ForLoop forLoop = (ForLoop) loop;
+			forLoop.setCost(computeCost(forLoop)); 
+		}
+	}
+	
+	public int computeCost(ForLoop loop) {
+		int cost = 1;
+		for (String relLoop : relLoops) {
+			cost = cost *2;
+		}
+		cost = cost * loop.getIndexRange() ;
+		return cost;
+	}
+	
+	private boolean isIndependent(ForLoop loop, Set<ForLoop> worklist) {
+		for (ForLoop otherLoop : worklist) {
+			if (loop != otherLoop && !Collections.disjoint(loop.getRelLoops(), otherLoop.getRelLoops())) {
+				return false;
 			}
 		}
+		
+		return true;
 	}
-	
-	public double computeCost(ForLoop loop1, ForLoop loop2) {
-		// Check if relLoops of loop1 is a subset of relLoops of loop2
-		System.out.printf("computer cost 1");
-		if (isSubset(loop1.getRelLoops(), loop2.getRelLoops())) {
-			System.out.printf("computer cost 2");
-			// Compute cost based on some logic
-			// For example, you could multiply the ranges of index values of loops in relLoops
-			double cost = loop1.getIndexRange() * loop2.getIndexRange();
-			return cost;
-		} else {
-			// If relLoops of loop1 is not a subset of relLoops of loop2, return a high cost
-			return Double.MAX_VALUE;
-		}
-	}
-	
+
 	public void minUnion() {
-		// Calculate costs for all loops
-		calculateCost();
-		
-		// Create forest F to record optimized order to compute the reductions
-		Forest F = new Forest();
-		
-		// Create worklist and add initial nodes
 		Set<ForLoop> worklist = new HashSet<>(createInitialNodes(loops));
 	
-		// While worklist is not empty
+		calculateCost(worklist);
+	
+		Forest F = new Forest();
+		List<ForLoop> loopsToRemove = new ArrayList<>(); // Store loops to remove
+	
+		for (ForLoop thisLoop : worklist) {
+			if (thisLoop.getRelLoops().isEmpty() || isIndependent(thisLoop, worklist)) {
+				F.addNode(thisLoop);
+				loopsToRemove.add(thisLoop); // Add to remove list
+			}
+		}
+	
+		worklist.removeAll(loopsToRemove);
+	
 		while (!worklist.isEmpty()) {
-			// Find loop with minimum cost in worklist
 			ForLoop thisLoop = findMinimumCostLoop(worklist);
-			System.out.printf("findMinimumCostLoop %s", thisLoop.getIter());
-			// Remove thisLoop from worklist and add it to F
+	
 			worklist.remove(thisLoop);
 			F.addNode(thisLoop);
-			
-			// Update cost of other loops in worklist
 			for (ForLoop l : worklist) {
-				System.out.printf("work list");
-				if (isSubset(thisLoop.getRelLoops(), l.getRelLoops())) {
-					// Update cost of l based on the minimum union algorithm
+				if (isSubset(thisLoop.getRelLoops(), l.getRelLoops()) ) {//&& !thisLoop.getRelLoops().contains(l.getIter())
+
+					l.addChild(thisLoop);
 					l.setCost(l.getCost() / thisLoop.getIndexRange());
 				}
 			}
 			
-			// Confirm parent relation with children
 			for (ForLoop c : thisLoop.getChildren()) {
-				System.out.printf("parent loop");
 				if (c.getParent() != null) {
 					c.getParent().removeChild(c);
 				} else {
@@ -287,11 +273,10 @@ public class LER {
 				}
 			}
 		}
-		
+	
 		// Output forest F
 		F.output();
 	}
 	
-	 
 	
 }
