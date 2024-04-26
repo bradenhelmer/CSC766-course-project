@@ -23,7 +23,7 @@ public class ForLoop implements LER.Loop {
 
 	@Override
 	public String toString() {
-		return String.format("%s∫%s,%s∫", GloryUtil.getLoopSymbol(type), lb, ub);
+		return String.format("%s%s∫%s,%s∫", GloryUtil.getLoopSymbol(type), iter, lb, ub);
 	}
 
 	public void print() {

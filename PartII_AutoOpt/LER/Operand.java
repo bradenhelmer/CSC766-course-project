@@ -9,11 +9,34 @@ public class Operand {
 	// Raw operand string from AST
 	private String raw;
 
+	private String prevOp;
+	private String nextOp;
+
+	private boolean isIndexed;
+
+	public void setPrevOp(String prev) {
+		prevOp = prev;
+	}
+
+	public void setNextOp(String next) {
+		nextOp = next;
+	}
+
+	public String getPrevOp() {
+		return prevOp;
+	}
+
+	public String getNextOp() {
+		return nextOp;
+	}
+
 	// Variable name, separated from access.
 	private String varName;
 
 	public Operand(String raw) {
 		relLoops = new LinkedHashSet<String>();
+		nextOp = "";
+		prevOp = "";
 		this.raw = raw;
 	}
 
@@ -23,6 +46,14 @@ public class Operand {
 
 	@Override
 	public String toString() {
+		if (isIndexed) {
+			if (raw.contains("(")) {
+				return varName + raw.substring(raw.indexOf('('));
+			}
+			if (raw.contains("[")) {
+				return varName + raw.substring(raw.indexOf('['));
+			}
+		}
 		return raw;
 	}
 
@@ -47,12 +78,13 @@ public class Operand {
 		if (raw.contains("[") && raw.contains("]")) {
 			open = raw.indexOf('[');
 			close = raw.lastIndexOf(']');
-
+			isIndexed = true;
 		} else if (raw.contains("(") && raw.contains(")")) {
 			open = raw.indexOf('(');
 			if (open == 0)
 				return;
 			close = raw.lastIndexOf(')');
+			isIndexed = true;
 		} else {
 			varName = raw;
 			return;
@@ -70,6 +102,10 @@ public class Operand {
 
 	public Set<String> getRelLoops() {
 		return relLoops;
+	}
+
+	public void replaceVarName(String newName) {
+		varName = newName;
 	}
 
 }

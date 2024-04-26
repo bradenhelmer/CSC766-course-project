@@ -18,12 +18,12 @@ public class LER {
 	private LinkedHashSet<String> iterVars;
 
 	// Expression -> E
-	private String rawE;
 	private LinkedList<Operand> operands;
 	private LinkedList<String> ops;
 
 	// Result operand LE -> R
-	private String result;
+	private String rawE;
+	private Operand result;
 
 	// Holds the potential multiple LER statements after optimization.
 	private List<LER> optimized;
@@ -49,12 +49,34 @@ public class LER {
 		ops.add(OP);
 	}
 
+	public String getLastOp() {
+		return ops.get(ops.size() - 1);
+	}
+
+	public Operand getLastOperand() {
+		return operands.get(operands.size() - 1);
+	}
+
+	public LinkedList<Operand> getOperands() {
+		return operands;
+	}
+
 	public void addOperand(String O) {
 		operands.add(new Operand(O));
 	}
 
+	public void addOperands(List<Operand> operands) {
+		this.operands.addAll(operands);
+	}
+
+	public void addOperand(Operand O) {
+		operands.add(O);
+	}
+
 	public void setResult(String R) {
-		result = R;
+		result = new Operand(R);
+		if (!iterVars.isEmpty())
+			result.selfAbstract(iterVars);
 	}
 
 	public void setE(String E) {
@@ -62,18 +84,23 @@ public class LER {
 	}
 
 	// OUTPUT Methods
-	
+
 	// LER String representation.
 	@Override
 	public String toString() {
 		String output = "";
 		for (Loop L : loops) {
 			output += L.toString();
-		}	
-		output += rawE + "=" + result;
+		}
+
+		for (int i = 0; i < operands.size(); ++i) {
+			Operand O = operands.get(i);
+			output += O.toString() + O.getNextOp();
+		}
+
+		output += "=" + result;
 		return output;
 	}
-
 
 	// Output pseudo code for loops.
 	public void outputPseudo(boolean abstracted) {
@@ -110,28 +137,54 @@ public class LER {
 		// Iterate backwards from inner to outer loops.
 		ArrayList<Operand> toBeMoved;
 		ArrayList<Operand> stayingPut = new ArrayList<Operand>();
-		int tempCount = 0;
+		int tempNum = 0;
 
 		for (int i = loops.size() - 1; i >= 0; --i) {
 			toBeMoved = new ArrayList<Operand>();
 			Loop L = loops.get(i);
 			if (L instanceof ForLoop FL) {
 				for (Operand O : operands) {
-					// We need to check here that we havent already looked at an operand.
-					if (!O.getRelLoops().contains(FL.getIter()) && !stayingPut.contains(O))
-						toBeMoved.add(O);
-					else
-						stayingPut.add(O);
-
+					if (!O.getRelLoops().isEmpty()) {
+						// We need to check here that we havent already looked at an operand.
+						if (!O.getRelLoops().contains(FL.getIter()) && !stayingPut.contains(O))
+							toBeMoved.add(O);
+						else
+							stayingPut.add(O);
+					}
 				}
 			}
 
 			// Check we have a variable to remove here.
 			if (!toBeMoved.isEmpty()) {
-				String tempVar = String.format("temp%d", tempCount++);
+				String newR = String.format("TEMP%d", tempNum++);
+				LER newLER = new LER();
+
+				for (Loop l : loops) {
+					if (l instanceof ForLoop FL) {
+						for (Operand O : toBeMoved) {
+							if (O.getRelLoops().contains(FL.getIter())) {
+
+								// Create new result variable as an operand.
+
+								newLER.addLoop(FL);
+								newLER.addOperands(operands);
+								newLER.setResult(result.getRaw());
+								result.replaceVarName(newR);
+								System.out.println(result);
+							}
+						}
+					}
+				}
 				operands.removeAll(toBeMoved);
+
+				optimized.add(this);
+				optimized.add(newLER);
+				newLER.getOperands().removeAll(stayingPut);
+				newLER.addOperand(result);
+
 			}
 		}
+
 	}
 
 	// OPTIMIZATION METHODS
