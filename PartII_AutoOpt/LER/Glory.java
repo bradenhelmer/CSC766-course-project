@@ -38,9 +38,6 @@ public class Glory {
 		System.out.println("\nLER:");
 		ler.outputLER();
 
-		// } catch (Exception e) {
-		// System.out.println("Invalid Input");
-		// }
 	}
 
 }

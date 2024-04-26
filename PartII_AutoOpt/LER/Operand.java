@@ -42,11 +42,7 @@ public class Operand {
 	}
 
 	public Set<String> selfAbstract(Set<String> itervars) {
-		
-	
-	public Set<String> selfAbstract(Set<String> itervars) {
-		
-	
+
 		// Check if an actual index var brackets or parentheses.
 		int open, close;
 		if (raw.contains("[") && raw.contains("]")) {
@@ -54,48 +50,39 @@ public class Operand {
 			close = raw.lastIndexOf(']');
 		} else if (raw.contains("(") && raw.contains(")")) {
 			open = raw.indexOf('(');
+			close = raw.lastIndexOf(')');
 			if (open == 0)
 				return relLoops; // Return empty set if no relevant loops found
-				return relLoops; // Return empty set if no relevant loops found
-			close = raw.lastIndexOf(')');
 		} else {
 			// If neither brackets nor parentheses are found, return empty set
 			return relLoops;
-			// If neither brackets nor parentheses are found, return empty set
-			return relLoops;
 		}
-	
-	
+
 		String access = raw.substring(open, close + 1);
 		String varName = raw.substring(0, open);
-	
+
 		// Add loop variables to relLoops if they are found in the access part
-		String varName = raw.substring(0, open);
-	
+		this.varName = varName;
+
 		// Add loop variables to relLoops if they are found in the access part
 		for (String iterVar : itervars) {
 			if (access.contains(iterVar)) {
-			if (access.contains(iterVar)) {
-				relLoops.add(iterVar);
+				if (access.contains(iterVar)) {
+					relLoops.add(iterVar);
+				}
 			}
+
 		}
-	
 		return relLoops;
 	}
-	
-
-	public Set<String> getRelLoops() {
-		//System.out.printf("relLoop %s",relLoops);
-        return relLoops;
-    }
-
-    // Setter for relLoops
-    public void setRelLoops(Set<String> relLoops) {
-        this.relLoops = relLoops;
-    }
 
 	public Set<String> getRelLoops() {
 		return relLoops;
+	}
+
+	// Setter for relLoops
+	public void setRelLoops(Set<String> relLoops) {
+		this.relLoops = relLoops;
 	}
 
 }
