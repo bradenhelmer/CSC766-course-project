@@ -46,10 +46,6 @@ public class LER {
 		loops.add(L);
 	}
 
-	public LinkedList<Loop> getLoops() {
-		return loops;
-	}
-
 	private List<Loop> getForLoopsFromRelLoops(Set<String> RL) {
 		return loops.stream().filter(loop -> (loop instanceof ForLoop FL) && RL.contains(FL.getIter())).toList();
 	}

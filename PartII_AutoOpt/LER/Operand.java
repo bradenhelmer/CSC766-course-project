@@ -93,8 +93,8 @@ public class Operand implements Cloneable {
 
 		} else if (raw.contains("(") && raw.contains(")")) {
 			open = raw.indexOf('(');
-      if (open == 0)
-				return relLoops
+			if (open == 0)
+				return relLoops;
 			close = raw.lastIndexOf(')');
 
 			isIndexed = true;
@@ -126,13 +126,13 @@ public class Operand implements Cloneable {
 		return relLoops;
 	}
 
-
 	public void replaceVarName(String newName) {
 		varName = newName;
 	}
 
 	public boolean isIndexed() {
 		return isIndexed;
+	}
 
 	// Setter for relLoops
 	public void setRelLoops(Set<String> relLoops) {
