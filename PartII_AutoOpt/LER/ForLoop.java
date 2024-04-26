@@ -1,6 +1,7 @@
 
 // For loop Abstraction
 import java.lang.IllegalArgumentException;
+import java.util.*;
 
 public class ForLoop implements LER.Loop {
 	private String iter;
@@ -8,11 +9,23 @@ public class ForLoop implements LER.Loop {
 	private String ub;
 	private int type;
 	private int step = 1;
+	private String ID;
+    private int cost;
+    private Set<String> relLoops;
+    private Set<ForLoop> children;
+    private ForLoop parent;
+    private int indexRange;
 
 	public ForLoop(String iter, String lb, String ub, int type) throws IllegalArgumentException {
 		this.iter = iter;
 		this.lb = lb;
 		this.ub = ub;
+		this.ID = ID;
+        this.cost = 0;
+        this.relLoops = new HashSet<>();
+        this.children = new HashSet<>();
+        this.parent = null;
+        this.indexRange = 1;
 		if (GloryUtil.isForType(type)) {
 			this.type = type;
 		} else {
@@ -79,5 +92,70 @@ public class ForLoop implements LER.Loop {
 	public void setStep(int step) {
 		this.step = step;
 	}
+    
+    
+    public int getCost() {
+		System.out.print(cost);
+        return cost;
+    }
+    
+    public void setCost(int cost) {
+		this.cost = cost;
+		//System.out.println("setCost: " + this.cost); 
+    }
+    
+    public Set<String> getRelLoops() {
+		//System.out.printf("getFor %s",this.relLoops);
+        return this.relLoops;
+    }
+    
+    public Set<ForLoop> getChildren() {
+        return children;
+    }
+    
+    public void addChild(ForLoop child) {
+        children.add(child);
+    }
+    
+    public void removeChild(ForLoop child) {
+        children.remove(child);
+    }
+    
+    public ForLoop getParent() {
+        return parent;
+    }
+    
+    public void setParent(ForLoop parent) {
+        this.parent = parent;
+    }
+    public Integer tryParseInt(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch (NumberFormatException e) {
+			// If the string cannot be parsed as an integer, return null
+			return null;
+		}
+	}
+    public int getIndexRange() {
+		Integer lbVal = tryParseInt(lb);
+		Integer ubVal = tryParseInt(ub);
+		if (lbVal != null && ubVal != null) {
+			int lowerBound = Integer.parseInt(lb);
+			int upperBound = Integer.parseInt(ub);
+			return upperBound - lowerBound + 1;
+		} else {
+			return 1;
+		}
+        
+    }
+    
+    public void setIndexRange(int indexRange) {
+        this.indexRange = indexRange;
+    }
+    
+	public void setRelLoops(Set<String> relLoops) {
+		//System.out.printf("SetFor %s",relLoops);
+        this.relLoops = relLoops;
+    }
 
 }

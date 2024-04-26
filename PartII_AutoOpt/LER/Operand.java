@@ -81,37 +81,51 @@ public class Operand implements Cloneable {
 		return sb.toString();
 	}
 
-	public void selfAbstract(Set<String> itervars) {
+	public Set<String> selfAbstract(Set<String> itervars) {
+
 		// Check if an actual index var brackets or parentheses.
 		int open, close;
 		if (raw.contains("[") && raw.contains("]")) {
 			open = raw.indexOf('[');
 			close = raw.lastIndexOf(']');
+
 			isIndexed = true;
+
 		} else if (raw.contains("(") && raw.contains(")")) {
 			open = raw.indexOf('(');
-			if (open == 0)
-				return;
+      if (open == 0)
+				return relLoops
 			close = raw.lastIndexOf(')');
+
 			isIndexed = true;
+
 		} else {
-			varName = raw;
-			return;
+			// If neither brackets nor parentheses are found, return empty set
+			return relLoops;
 		}
 
 		String access = raw.substring(open, close + 1);
+		String varName = raw.substring(0, open);
 
-		varName = raw.substring(0, open);
+		// Add loop variables to relLoops if they are found in the access part
+		this.varName = varName;
 
+		// Add loop variables to relLoops if they are found in the access part
 		for (String iterVar : itervars) {
-			if (access.contains(iterVar))
-				relLoops.add(iterVar);
+			if (access.contains(iterVar)) {
+				if (access.contains(iterVar)) {
+					relLoops.add(iterVar);
+				}
+			}
+
 		}
+		return relLoops;
 	}
 
 	public Set<String> getRelLoops() {
 		return relLoops;
 	}
+
 
 	public void replaceVarName(String newName) {
 		varName = newName;
@@ -119,6 +133,11 @@ public class Operand implements Cloneable {
 
 	public boolean isIndexed() {
 		return isIndexed;
+
+	// Setter for relLoops
+	public void setRelLoops(Set<String> relLoops) {
+		this.relLoops = relLoops;
+
 	}
 
 }
