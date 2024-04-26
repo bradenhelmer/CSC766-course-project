@@ -1,9 +1,6 @@
 // LER Notation Abstraction
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class LER {
 
@@ -45,6 +42,14 @@ public class LER {
 		loops.add(L);
 	}
 
+	public LinkedList<Loop> getLoops() {
+		return loops;
+	}
+
+	private List<Loop> getForLoopsFromRelLoops(Set<String> RL) {
+		return loops.stream().filter(loop -> (loop instanceof ForLoop FL) && RL.contains(FL.getIter())).toList();
+	}
+
 	public void addOp(String OP) {
 		ops.add(OP);
 	}
@@ -77,6 +82,10 @@ public class LER {
 		result = new Operand(R);
 		if (!iterVars.isEmpty())
 			result.selfAbstract(iterVars);
+	}
+
+	public void setResult(Operand R) {
+		result = R;
 	}
 
 	public void setE(String E) {
@@ -152,37 +161,99 @@ public class LER {
 							stayingPut.add(O);
 					}
 				}
+			} else {
+				for (Operand O : operands) {
+					if (O.isIndexed()) {
+						toBeMoved.add(O);
+					}
+				}
 			}
 
-			// Check we have a variable to remove here.
-			if (!toBeMoved.isEmpty()) {
-				String newR = String.format("TEMP%d", tempNum++);
-				LER newLER = new LER();
-
-				for (Loop l : loops) {
-					if (l instanceof ForLoop FL) {
-						for (Operand O : toBeMoved) {
-							if (O.getRelLoops().contains(FL.getIter())) {
-
-								// Create new result variable as an operand.
-
-								newLER.addLoop(FL);
-								newLER.addOperands(operands);
-								newLER.setResult(result.getRaw());
-								result.replaceVarName(newR);
-								System.out.println(result);
+			// Algorithm:
+			// 1. For each rel loop in an operand that is getting replaced
+			// - Create a new LER object with that loop(s) and operand(s) pointing to a new
+			// variable.
+			while (!toBeMoved.isEmpty()) {
+				ArrayList<Operand> operandsWithMatchingRelLoops = new ArrayList<Operand>();
+				Set<String> currRelLoops = new LinkedHashSet<String>();
+				Iterator<Operand> it = toBeMoved.iterator();
+				while (it.hasNext()) {
+					Operand O = it.next();
+					if (operandsWithMatchingRelLoops.isEmpty()) {
+						operandsWithMatchingRelLoops.add(O);
+						currRelLoops = O.getRelLoops();
+						it.remove();
+					} else {
+						@SuppressWarnings("unchecked")
+						ArrayList<Operand> omrCpy = (ArrayList<Operand>) operandsWithMatchingRelLoops.clone();
+						for (Operand OMR : omrCpy) {
+							if (O.getRelLoops().equals(OMR.getRelLoops())) {
+								operandsWithMatchingRelLoops.add(O);
+								it.remove();
+							} else {
+								continue;
 							}
 						}
 					}
 				}
-				operands.removeAll(toBeMoved);
 
+				// Get actual loops for new LER
+				List<Loop> loopList = getForLoopsFromRelLoops(currRelLoops);
+
+				// Construct new LER for removed loops.
+				LER newLer = new LER();
+				loopList.forEach(loop -> newLer.addLoop(loop));
+				Operand newResult;
+				if (result.isIndexed()) {
+					Operand rClone = (Operand) result.clone();
+					rClone.replaceVarName(String.format("TEMP%d", tempNum++));
+					newResult = rClone;
+				} else {
+					newResult = new Operand(String.format("TEMP%d", tempNum++));
+				}
+
+				newResult.setPrevOp(operandsWithMatchingRelLoops.get(0).getPrevOp());
+				newResult.setNextOp(
+						operandsWithMatchingRelLoops.get(operandsWithMatchingRelLoops.size() - 1).getNextOp());
+				List<Operand> clones = new ArrayList<Operand>();
+				for (Operand O : operandsWithMatchingRelLoops) {
+					clones.add((Operand) O.clone());
+				}
+				clones.get(0).setPrevOp("");
+				clones.get(clones.size() - 1).setNextOp("");
+				newLer.addOperands(clones);
+				newLer.setResult(newResult);
+
+				// Do operand switch
+				int last_index = 0;
+				for (Operand O : operandsWithMatchingRelLoops) {
+					if (operands.contains(O)) {
+						last_index = operands.indexOf(O);
+						operands.remove(O);
+					}
+				}
+
+				// Clean up unnecessary loops in self
+				for (Loop l : loops) {
+					if (l instanceof ForLoop FL) {
+						boolean stay = false;
+						for (Operand O : operands) {
+							if (O.isIndexed() && O.getRelLoops().contains(FL.getIter()) || stayingPut.contains(O)) {
+								stay = true;
+							}
+						}
+						if (!stay) {
+							loops.remove(l);
+						}
+					}
+				}
+
+				operands.add(last_index, newResult);
+				optimized.add(newLer);
 				optimized.add(this);
-				optimized.add(newLER);
-				newLER.getOperands().removeAll(stayingPut);
-				newLER.addOperand(result);
 
 			}
+
 		}
 
 	}

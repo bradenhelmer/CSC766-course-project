@@ -3,7 +3,7 @@
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class Operand {
+public class Operand implements Cloneable {
 
 	private Set<String> relLoops;
 	// Raw operand string from AST
@@ -57,6 +57,15 @@ public class Operand {
 		return raw;
 	}
 
+	@Override
+	public Operand clone() {
+		try {
+			return (Operand) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
+	}
+
 	public String getAbstracted() {
 		if (relLoops.isEmpty()) {
 			return raw;
@@ -106,6 +115,10 @@ public class Operand {
 
 	public void replaceVarName(String newName) {
 		varName = newName;
+	}
+
+	public boolean isIndexed() {
+		return isIndexed;
 	}
 
 }

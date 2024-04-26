@@ -11,4 +11,4 @@ clean:
 	rm $(LER_DIR)/*.class testResult/*
 
 test: compile
-	java --class-path="./LER:$$CLASSPATH" Glory testcases/case9.txt
+	java --class-path="./LER:$$CLASSPATH" Glory testcases/case2.txt
