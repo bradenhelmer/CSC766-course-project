@@ -15,7 +15,9 @@ public class Forest {
     public void output() {
         for (LER.Loop node : nodes) {
             System.out.printf("Forest:");
-            System.out.println(((ForLoop) node).getIter());
+            System.out.println(" iter" +((ForLoop) node).getIter());
+            System.out.println("parent" + ((ForLoop) node).getParent());
+            System.out.println("child" +((ForLoop) node).getChildren());
         }
     }
 }
