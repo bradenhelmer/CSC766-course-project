@@ -1,0 +1,11 @@
+LER Notation for FMRI main loop line: 66
+
+Note types were switched to int64_t instead of double,
+for testing purposes.
+
+Original
+Γinter∫0,iter∫ Σi∫0,N∫ Πj∫0,i∫ a[i] + (b[i] * c[j]) = a[i]
+
+Optimized:
+Σi∫0,N∫ Πj∫0,i∫ temp[i] + (b[i] * c[j]) = temp[i]
+Σi∫0,N∫ a[i] + temp[i] = a[i]

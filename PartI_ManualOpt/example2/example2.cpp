@@ -44,10 +44,12 @@ double b[m];
 void init_array() {
   int i, j;
 
-  for (i = 0; i < m; i++) {
+  a[0] = 0;
+  b[0] = 0;
+  for (i = 1; i < m; i++) {
     a[i] = 1 / i;
   }
-  for (i = 0; i < m; i++) {
+  for (i = 1; i < m; i++) {
     b[i] = 1 / i;
   }
 }

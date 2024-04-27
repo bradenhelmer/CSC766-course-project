@@ -1,0 +1,7 @@
+LER Notaion for ccsd_multisize line 84
+
+Original:
+	Σa∫0,V∫ Σb∫0,V∫ Σc∫0,V∫ Σi∫0,O∫ Σj∫0,O∫ Σk∫0,O∫ Σe∫0,V∫ Σm∫0,100O∫ X[a][b][c][i][j][k] + T2[c][e][i][j] * O2[a][b][e][k] = X[a][b][c][i][j][k]
+
+Optimized:
+	Σa∫0,V∫ Σb∫0,V∫ Σc∫0,V∫ Σi∫0,O∫ Σj∫0,O∫ Σk∫0,O∫ Σe∫0,V∫ X[a][b][c][i][j][k] + T2[c][e][i][j] * O2[a][b][e][k] * 1000 = X[a][b][c][i][j][k]
