@@ -3,17 +3,40 @@
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class Operand {
+public class Operand implements Cloneable {
 
 	private Set<String> relLoops;
 	// Raw operand string from AST
 	private String raw;
+
+	private String prevOp;
+	private String nextOp;
+
+	private boolean isIndexed;
+
+	public void setPrevOp(String prev) {
+		prevOp = prev;
+	}
+
+	public void setNextOp(String next) {
+		nextOp = next;
+	}
+
+	public String getPrevOp() {
+		return prevOp;
+	}
+
+	public String getNextOp() {
+		return nextOp;
+	}
 
 	// Variable name, separated from access.
 	private String varName;
 
 	public Operand(String raw) {
 		relLoops = new LinkedHashSet<String>();
+		nextOp = "";
+		prevOp = "";
 		this.raw = raw;
 	}
 
@@ -23,7 +46,24 @@ public class Operand {
 
 	@Override
 	public String toString() {
+		if (isIndexed) {
+			if (raw.contains("(")) {
+				return varName + raw.substring(raw.indexOf('('));
+			}
+			if (raw.contains("[")) {
+				return varName + raw.substring(raw.indexOf('['));
+			}
+		}
 		return raw;
+	}
+
+	@Override
+	public Operand clone() {
+		try {
+			return (Operand) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
 	}
 
 	public String getAbstracted() {
@@ -48,11 +88,17 @@ public class Operand {
 		if (raw.contains("[") && raw.contains("]")) {
 			open = raw.indexOf('[');
 			close = raw.lastIndexOf(']');
+
+			isIndexed = true;
+
 		} else if (raw.contains("(") && raw.contains(")")) {
 			open = raw.indexOf('(');
-			close = raw.lastIndexOf(')');
 			if (open == 0)
-				return relLoops; // Return empty set if no relevant loops found
+				return relLoops;
+			close = raw.lastIndexOf(')');
+
+			isIndexed = true;
+
 		} else {
 			// If neither brackets nor parentheses are found, return empty set
 			return relLoops;
@@ -80,9 +126,18 @@ public class Operand {
 		return relLoops;
 	}
 
+	public void replaceVarName(String newName) {
+		varName = newName;
+	}
+
+	public boolean isIndexed() {
+		return isIndexed;
+	}
+
 	// Setter for relLoops
 	public void setRelLoops(Set<String> relLoops) {
 		this.relLoops = relLoops;
+
 	}
 
 }

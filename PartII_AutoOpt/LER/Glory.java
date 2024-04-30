@@ -31,11 +31,11 @@ public class Glory {
 
 		LER ler = lerListener.exportLER();
 		ler.optimize();
-		System.out.println("Original:");
-		ler.outputPseudo(false);
-		System.out.println("\nOperands Abstracted:");
-		ler.outputPseudo(true);
-		System.out.println("\nLER:");
+		// System.out.println("Original:");
+		// ler.outputPseudo(false);
+		// System.out.println("\nOperands Abstracted:");
+		// ler.outputPseudo(true);
+		// System.out.println("\nLER:");
 		ler.outputLER();
 
 	}

@@ -125,6 +125,7 @@ public class LERListener extends GloryBaseListener {
 	// methods proved recursively difficult.
 	private void __parseOpsAndOperands(String E) {
 		StringBuilder sb = new StringBuilder();
+		int foundOperands = 0;
 		char arr[] = E.toCharArray();
 		for (int i = 0; i < E.length(); i++) {
 			sb.delete(0, sb.length());
@@ -144,11 +145,19 @@ public class LERListener extends GloryBaseListener {
 			}
 
 			if (sb.length() != 0) {
+				foundOperands++;
 				ler.addOperand(sb.toString());
+				if (foundOperands > 1) {
+					ler.getLastOperand().setPrevOp(ler.getLastOp());
+				}
 			}
 
 			if (i != E.length()) {
-				ler.addOp(Character.toString(arr[i]));
+				String op = Character.toString(arr[i]);
+				if (foundOperands > 0) {
+					ler.getLastOperand().setNextOp(op);
+				}
+				ler.addOp(op);
 			}
 		}
 	}
