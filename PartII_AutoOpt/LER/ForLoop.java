@@ -10,6 +10,7 @@ public class ForLoop implements LER.Loop {
 	private int type;
 	private int step = 1;
 	private String ID;
+
     private int cost;
     private Set<String> relLoops;
     private Set<ForLoop> children;
@@ -17,11 +18,13 @@ public class ForLoop implements LER.Loop {
     private int indexRange;
 	private ArrayList<Operand> toBeMoved;
 	private ArrayList<Operand> stayingPut;
+  
 	public ForLoop(String iter, String lb, String ub, int type) throws IllegalArgumentException {
 		this.iter = iter;
 		this.lb = lb;
 		this.ub = ub;
 		this.ID = ID;
+
         this.cost = 0;
         this.relLoops = new HashSet<>();
         this.children = new HashSet<>();
@@ -29,6 +32,7 @@ public class ForLoop implements LER.Loop {
         this.indexRange = 1;
 		this.toBeMoved = new ArrayList<Operand>();
 		this.stayingPut = new ArrayList<Operand>();
+
 		if (GloryUtil.isForType(type)) {
 			this.type = type;
 		} else {
@@ -94,63 +98,44 @@ public class ForLoop implements LER.Loop {
 	// Setter for step
 	public void setStep(int step) {
 		this.step = step;
-	}
-    
-    
-    public int getCost() {
-		//System.out.print(cost);
-        return cost;
-    }
-    
-    public void setCost(ArrayList<Operand> t) {
-		if(t.isEmpty()){
-			this.cost = Integer.MAX_VALUE;
-		}
-		else{
-			
-			this.cost = -(t.size());
-		}
-		this.toBeMoved = t;
-		//System.out.println("setCost: " + this.cost); 
-    }
-    
-	public void setOperand(ArrayList<Operand> t){
-		this.stayingPut = t;
+
+	public int getCost() {
+		System.out.print(cost);
+		return cost;
 	}
 
-	public ArrayList<Operand>  getOperand(){
-		return this.stayingPut ;
+	public void setCost(int cost) {
+		this.cost = cost;
+		// System.out.println("setCost: " + this.cost);
 	}
 
-    public Set<String> getRelLoops() {
-		//System.out.printf("getFor %s",this.relLoops);
-        return this.relLoops;
-    }
-    
-    public Set<ForLoop> getChildren() {
-        return children;
-    }
-    
-	public ArrayList<Operand> getToBeMoved() {
-        return this.toBeMoved;
-    }
+	public Set<String> getRelLoops() {
+		// System.out.printf("getFor %s",this.relLoops);
+		return this.relLoops;
+	}
 
-    public void addChild(ForLoop child) {
-        children.add(child);
-    }
-    
-    public void removeChild(ForLoop child) {
-        children.remove(child);
-    }
-    
-    public ForLoop getParent() {
-        return parent;
-    }
-    
-    public void setParent(ForLoop parent) {
-        this.parent = parent;
-    }
-    public Integer tryParseInt(String str) {
+	public Set<ForLoop> getChildren() {
+		return children;
+	}
+
+	public void addChild(ForLoop child) {
+		children.add(child);
+	}
+
+	public void removeChild(ForLoop child) {
+		children.remove(child);
+	}
+
+	public ForLoop getParent() {
+		return parent;
+	}
+
+	public void setParent(ForLoop parent) {
+		this.parent = parent;
+	}
+
+	public Integer tryParseInt(String str) {
+
 		try {
 			return Integer.parseInt(str);
 		} catch (NumberFormatException e) {
@@ -158,7 +143,8 @@ public class ForLoop implements LER.Loop {
 			return null;
 		}
 	}
-    public int getIndexRange() {
+
+	public int getIndexRange() {
 		Integer lbVal = tryParseInt(lb);
 		Integer ubVal = tryParseInt(ub);
 		if (lbVal != null && ubVal != null) {
@@ -168,18 +154,29 @@ public class ForLoop implements LER.Loop {
 		} else {
 			return 1;
 		}
-        
-    }
-    
-    public void setIndexRange(int indexRange) {
-        this.indexRange = indexRange;
-    }
-    
+
+	}
+
+	public void setIndexRange(int indexRange) {
+		this.indexRange = indexRange;
+	}
+
 	public void setRelLoops(Set<String> relLoops) {
+
 		//System.out.printf("SetFor %s",relLoops);
 		for (String loop : relLoops) {
             this.relLoops.add(loop);
         }
     }
+
+		// System.out.printf("SetFor %s",relLoops);
+		this.relLoops = relLoops;
+	}
+
+	@Override
+	public void printCStmt() {
+		System.out.printf("for (int %s = %s; %s <= %s; ++%s) {\n", iter, lb, iter, ub, iter);
+	}
+
 
 }

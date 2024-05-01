@@ -40,20 +40,19 @@ int main() {
   int internumber = 10000 / NMAX;
   if (internumber < 1)
     internumber = 1;
-  // orignial
+
+  // Optimized
   IF_TIME(t_start = rtclock());
 
 #pragma scop
-  for (int iter = 0; iter < internumber; iter++) {
-    for (i = 0; i < NMAX; i++) {
-      for (j = 0; j < NMAX; j++) {
-        for (k = 0; k < j - 1; k++) {
-          c[i][k] += a[j][k] * b[i][j];
-          c[i][j] += a[j][j] * b[i][j];
-        }
-        c[i][j] += a[j][j] * b[i][j];
-      }
-    }
+  for (i = 0; i < NMAX; i++) {
+	for (j = 0; j < NMAX; j++) {
+	  for (k = 0; k < j - 1; k++) {
+		c[i][k] += (a[j][k] * b[i][j]) * internumber;
+		c[i][j] += (a[j][j] * b[i][j]) * internumber;
+	  }
+	  c[i][j] += (a[j][j] * b[i][j]) * internumber;
+	}
   }
 #pragma endscop
 

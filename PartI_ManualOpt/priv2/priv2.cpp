@@ -5,7 +5,7 @@
 
 #define N 1000
 
-double a[N];
+double a[19900];
 double b[N][N];
 
 #define TIME 1
@@ -31,8 +31,8 @@ int main() {
   double t_start, t_end;
 
   for (i = 0; i < N; i++) {
-    a[i] = i;
     for (j = 0; j < N; j++) {
+	  a[10 * i + j] = i;
       b[i][j] = i * j;
     }
   }

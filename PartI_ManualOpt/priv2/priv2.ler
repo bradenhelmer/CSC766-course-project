@@ -1,0 +1,19 @@
+LER Noation for priv2.cpp
+
+Note:
+	- Array dimensions of A were modified to make the prorgam run,
+	  as well as the initialization loop.
+
+Original:
+	Σi∫0,N∫ Πj∫0,N∫ 0.0 = dist
+	Σi∫0,N∫ Πj∫0,N∫ 0.0 = dist1
+	Σi∫0,N∫ Πj∫0,N∫ Γk∫0,N∫ dist + a[10 * i + j] * a[10 * i + j] = dist
+	Σi∫0,N∫ Πj∫0,N∫ Γk∫0,N∫ dist1 + a[10 * i + j] + a[10 * i + j] = dist1
+	Σi∫0,N∫ Πj∫0,N∫ dist = b[i][j]
+	Σi∫0,N∫ Σj∫0,N∫ dist1 + b[i][j] = dist
+
+Optimized:
+	Σi∫0,N∫ Πj∫0,N∫ a[10 * i + j] * a[10 * i + j] = temp1
+	Σi∫0,N∫ Πj∫0,N∫ a[10 * i + j] + a[10 * i + j] = temp2
+	Σi∫0,N∫ Πj∫0,N∫ temp1 * N = b[i][j]
+	Σi∫0,N∫ Σj∫0,N∫ b[i][j] + temp2 * N = b[i][j]

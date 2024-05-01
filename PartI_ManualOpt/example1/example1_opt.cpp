@@ -67,7 +67,7 @@ double rtclock() {
 }
 double t_start, t_end;
 
-// example1
+// Optimized
 double example1_opt() {
 
   for (int l = 0; l < n; l++) {

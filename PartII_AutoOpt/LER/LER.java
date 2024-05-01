@@ -7,6 +7,8 @@ public class LER {
 	public interface Loop {
 		public void print();
 
+		public void printCStmt();
+
 		Set<String> getRelLoops();
 	}
 
@@ -60,6 +62,10 @@ public class LER {
 
 	public Operand getLastOperand() {
 		return operands.get(operands.size() - 1);
+	}
+
+	public Operand getResult() {
+		return result;
 	}
 
 	public LinkedList<Operand> getOperands() {
@@ -126,7 +132,7 @@ public class LER {
 			Operand O = operands.get(i);
 			System.out.printf("%s ", abstracted ? O.getAbstracted() : O.getRaw());
 			if (i < ops.size()) {
-				System.out.printf("%s ", ops.get(i));
+				System.out.printf("%s ", O.getNextOp());
 			}
 		}
 		System.out.println();
@@ -139,6 +145,36 @@ public class LER {
 		} else {
 			for (LER L : optimized) {
 				System.out.println(L.toString());
+			}
+		}
+	}
+
+	private void __outputCCodeInternal(LER ler) {
+		int indent = 0;
+		for (Loop L : ler.getLoops()) {
+			System.out.print(" ".repeat(2 * indent++));
+			L.printCStmt();
+		}
+		System.out.print(" ".repeat(2 * indent++));
+		System.out.printf("%s =", ler.getResult().getRaw());
+		for (Operand O : ler.getOperands()) {
+			System.out.printf(" %s%s", O.getRaw(), O.getNextOp().isEmpty() ? ";" : " " + O.getNextOp());
+		}
+		indent--;
+		while (indent > 0) {
+			System.out.printf("\n%s}", " ".repeat(2 * --indent));
+		}
+		System.out.println();
+
+	}
+
+	// Output C code for Part III
+	public void outputCCode() {
+		if (optimized.isEmpty()) {
+			__outputCCodeInternal(this);
+		} else {
+			for (LER L : optimized) {
+				__outputCCodeInternal(L);
 			}
 		}
 	}
@@ -509,6 +545,7 @@ public class LER {
 		// 	for (ForLoop l : worklist) {
 		// 		if (isSubset(thisLoop.getRelLoops(), l.getRelLoops())) {
 																		
+
 
 		// 			l.addChild(thisLoop);
 		// 			//l.setCost(l.getCost() / thisLoop.getIndexRange());

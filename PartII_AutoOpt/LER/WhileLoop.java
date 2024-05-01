@@ -10,6 +10,7 @@ public class WhileLoop implements LER.Loop {
 
 	public WhileLoop(String subscript) {
 		this.subscript = subscript;
+		this.conditionExpression = "";
 	}
 
 	@Override
@@ -26,8 +27,14 @@ public class WhileLoop implements LER.Loop {
 		System.out.printf("WHILE LOOP (%s)\n", subscript);
 	}
 
+
 	public Set<String> getRelLoops() {
         Set<String> relLoops = new HashSet<>();
 		return relLoops;
     }
+
+	@Override
+	public void printCStmt() {
+		System.out.printf("while (%s) {\n", conditionExpression);
+	}
 }

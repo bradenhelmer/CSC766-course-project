@@ -26,17 +26,27 @@ public class Glory {
 		ParseTreeWalker walker = new ParseTreeWalker();
 		LERListener lerListener = new LERListener();
 		walker.walk(lerListener, drinkSentenceContext);
-		// DirectiveListener listener = new DirectiveListener();
-		// walker.walk(listener, drinkSentenceContext);
 
 		LER ler = lerListener.exportLER();
-		ler.optimize();
-		System.out.println("Original:");
-		ler.outputPseudo(false);
-		System.out.println("\nOperands Abstracted:");
-		ler.outputPseudo(true);
-		System.out.println("\nLER:");
+
+		// Print Original
+		System.out.println("Original LER:");
 		ler.outputLER();
+		System.out.println();
+
+		// Run Optimizer
+		ler.optimize();
+
+		// Print Optimized
+		System.out.println("Optimized LER:");
+
+		ler.outputLER();
+		System.out.println();
+
+		// Output C Code
+		System.out.println("Optimized C Code:\n-----------------");
+		ler.outputCCode();
+
 
 	}
 
