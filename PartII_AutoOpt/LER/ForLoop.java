@@ -15,7 +15,8 @@ public class ForLoop implements LER.Loop {
     private Set<ForLoop> children;
     private ForLoop parent;
     private int indexRange;
-
+	private ArrayList<Operand> toBeMoved;
+	private ArrayList<Operand> stayingPut;
 	public ForLoop(String iter, String lb, String ub, int type) throws IllegalArgumentException {
 		this.iter = iter;
 		this.lb = lb;
@@ -26,6 +27,8 @@ public class ForLoop implements LER.Loop {
         this.children = new HashSet<>();
         this.parent = null;
         this.indexRange = 1;
+		this.toBeMoved = new ArrayList<Operand>();
+		this.stayingPut = new ArrayList<Operand>();
 		if (GloryUtil.isForType(type)) {
 			this.type = type;
 		} else {
@@ -95,15 +98,30 @@ public class ForLoop implements LER.Loop {
     
     
     public int getCost() {
-		System.out.print(cost);
+		//System.out.print(cost);
         return cost;
     }
     
-    public void setCost(int cost) {
-		this.cost = cost;
+    public void setCost(ArrayList<Operand> t) {
+		if(t.isEmpty()){
+			this.cost = Integer.MAX_VALUE;
+		}
+		else{
+			
+			this.cost = -(t.size());
+		}
+		this.toBeMoved = t;
 		//System.out.println("setCost: " + this.cost); 
     }
     
+	public void setOperand(ArrayList<Operand> t){
+		this.stayingPut = t;
+	}
+
+	public ArrayList<Operand>  getOperand(){
+		return this.stayingPut ;
+	}
+
     public Set<String> getRelLoops() {
 		//System.out.printf("getFor %s",this.relLoops);
         return this.relLoops;
@@ -113,6 +131,10 @@ public class ForLoop implements LER.Loop {
         return children;
     }
     
+	public ArrayList<Operand> getToBeMoved() {
+        return this.toBeMoved;
+    }
+
     public void addChild(ForLoop child) {
         children.add(child);
     }
@@ -155,7 +177,9 @@ public class ForLoop implements LER.Loop {
     
 	public void setRelLoops(Set<String> relLoops) {
 		//System.out.printf("SetFor %s",relLoops);
-        this.relLoops = relLoops;
+		for (String loop : relLoops) {
+            this.relLoops.add(loop);
+        }
     }
 
 }

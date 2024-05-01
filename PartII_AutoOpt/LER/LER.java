@@ -262,7 +262,8 @@ public class LER {
 	// OPTIMIZATION METHODS
 	public void optimize() {
 		abstractOperands();
-		cat4Removal();
+		cat3Removal();
+		//cat4Removal();
 	}
 
 	// Performs operand abstraction, computing relLoops(x) for each operand.
@@ -275,17 +276,139 @@ public class LER {
 
 	}
 
-	public void setRelLoopsForForLoops() {
-		for (Operand operand : operands) {
-			Set<String> relLoops = operand.selfAbstract(iterVars);
-			for (Loop loop : loops) {
-				if (loop instanceof ForLoop) {
-					ForLoop forLoop = (ForLoop) loop;
-					if (relLoops.contains(forLoop.getIter())) {
-						forLoop.setRelLoops(relLoops);
+	private void cat3Removal(){
+		setRelLoopsForForLoops();
+		
+		ArrayList<Operand> toBeMoved;
+		ArrayList<Operand> stayingPut ;
+		int tempNum = 0;
+		//ArrayList<Operand>[] toBeMoved = new ArrayList[loops.size()];
+		// for (int i = 0; i < loops.size(); i++) {
+		// 	toBeMoved[i] = new ArrayList<Operand>();
+		// }
+		for (int i = 0; i< loops.size(); i++) {
+			toBeMoved = new ArrayList<Operand>();
+			stayingPut = new ArrayList<Operand>();
+			Loop L = loops.get(i);
+			if (L instanceof ForLoop FL) {
+				for (Operand O : operands) {
+					if (!O.getRelLoops().isEmpty()) {
+						// We need to check here that we havent already looked at an operand.
+						if (!O.getRelLoops().contains(FL.getIter()) )//&& !stayingPut.contains(O)
+							toBeMoved.add(O);
+						else if(O.getRelLoops().contains(FL.getIter()))
+							stayingPut.add(O);
+					}
+				}
+				FL.setCost(toBeMoved);
+				FL.setOperand(stayingPut);
+				System.out.println("tobemoved"+toBeMoved+ "!!" + stayingPut);
+			} else {
+				for (Operand O : operands) {
+					if (O.isIndexed()) {
+						toBeMoved.add(O);
+					}
+				}
+			}			
+			
+			// }Σi∫1,M∫Σj∫1,M∫Γk∫1,N∫Σl∫1,N∫x[i,l]*y[l,j]*s[j,k]=r[i,k]//Σi∫1,N∫Σj∫1,N∫Σk∫1,N∫Σt∫1,N∫a[i,j]*b[i,k]=x
+		}
+		ForLoop thisLoop = findMinimumCostLoop();
+		//System.out.println("cost"+thisLoop.getCost());
+		// if(thisLoop.getOperand().isEmpty()){
+
+		// }
+		//ArrayList<Operand> operandsWithMatchingRelLoops = new ArrayList<Operand>();
+		Set<String> currRelLoops = new LinkedHashSet<String>();
+
+		ArrayList<Operand> candidateOp = thisLoop.getToBeMoved();
+		
+		if (candidateOp != null) {
+			for (int j = 0; j < candidateOp.size(); j++) {
+				currRelLoops.addAll(candidateOp.get(j).getRelLoops());
+			}
+		}
+				
+			// System.out.println("currRelLoops" + currRelLoops);
+			// // Get actual loops for new LER
+			List<Loop> loopList = getForLoopsFromRelLoops(currRelLoops);
+			
+			System.out.println("loppList" + loopList);
+			// Construct new LER for removed loops.
+			LER newLer = new LER();
+			loopList.forEach(loop -> newLer.addLoop(loop));
+			Operand newResult;
+			if (result.isIndexed()) {
+				System.out.println("injaaa");
+				Operand rClone = (Operand) result.clone();
+				rClone.replaceVarName(String.format("TEMP%d", tempNum++));
+				newResult = rClone;
+				System.out.println("injaaa" + newResult);
+			} else {
+				System.out.println("injaaa222");
+				newResult = new Operand(String.format("TEMP%d", tempNum++));
+			}
+			
+			newResult.setPrevOp(thisLoop.getToBeMoved().get(0).getPrevOp());
+			newResult.setNextOp(
+				thisLoop.getToBeMoved().get(thisLoop.getToBeMoved().size() - 1).getNextOp());
+			List<Operand> clones = new ArrayList<Operand>();
+			for (Operand O : thisLoop.getToBeMoved()) {
+				clones.add((Operand) O.clone());
+			}
+			clones.get(0).setPrevOp("");
+			clones.get(clones.size() - 1).setNextOp("");
+			newLer.addOperands(clones);
+			newLer.setResult(newResult);
+
+			// Do operand switch
+			int last_index = 0;
+			for (Operand O : thisLoop.getOperand()) {
+				if (operands.contains(O)) {
+					System.out.println("injaaa3");
+					last_index = operands.indexOf(O);
+					operands.remove(O);
+				}
+			}
+
+			// Clean up unnecessary loops in self
+			for (Loop l : loops) {
+				if (l instanceof ForLoop FL) {
+					boolean stay = false;
+					for (Operand O : operands) {
+						if (O.isIndexed() && O.getRelLoops().contains(FL.getIter())) {
+							stay = true;
+						}
+					}
+					if (!stay) {
+						loops.remove(l);
 					}
 				}
 			}
+
+			operands.add(last_index, newResult);
+			optimized.add(newLer);
+			optimized.add(this);
+
+		//}
+		//minUnion() ;
+	}
+
+	private void setRelLoopsForForLoops() {
+		
+			//Set<String> relLoops = operand.selfAbstract(iterVars);
+		for (Loop loop : loops) {
+			if (loop instanceof ForLoop) {
+					ForLoop forLoop = (ForLoop) loop;
+				for (Operand operand : operands) {
+						//System.out.println("operator " + forLoop.getIter());
+						if(operand.getRelLoops().contains(forLoop.getIter())){
+							forLoop.setRelLoops(operand.getRelLoops());
+						}
+				}
+				System.out.println("loop relLoops: " + forLoop.getRelLoops());
+			}
+			
 		}
 	}
 
@@ -304,33 +427,40 @@ public class LER {
 
 			if (node instanceof ForLoop) {
 				ForLoop forLoop = (ForLoop) node;
-				if (forLoop.getType() == 23 || forLoop.getType() == 24) {// check to be reduction loop
-					initialNodes.add((ForLoop) forLoop);
-				}
+				//if (forLoop.getType() == 23 || forLoop.getType() == 24) {// check to be reduction loop
+				initialNodes.add((ForLoop) forLoop);
+				//}
 			}
 		}
 		return initialNodes;
 	}
 
-	public ForLoop findMinimumCostLoop(Set<ForLoop> worklist) {
+	public ForLoop findMinimumCostLoop() {
 		int min = Integer.MAX_VALUE;
 		ForLoop minLoop = null;
-
-		for (ForLoop loop : worklist) {
-			minLoop = (ForLoop) loop;
-			min = Math.min(min, minLoop.getCost());
-
+	
+		for (Loop loop : loops) {
+			if (loop instanceof ForLoop) {
+				ForLoop currentLoop = (ForLoop) loop;
+				int cost = currentLoop.getCost();
+				if (cost < min) {
+					min = cost;
+					minLoop = currentLoop;
+				}
+			}
 		}
+	
 		return minLoop;
 	}
+	
 
 	public void calculateCost(Set<ForLoop> worklist) {
 
-		for (ForLoop loop : worklist) {
+		// for (ForLoop loop : worklist) {
 
-			ForLoop forLoop = (ForLoop) loop;
-			forLoop.setCost(computeCost(forLoop));
-		}
+		// 	ForLoop forLoop = (ForLoop) loop;
+		// 	forLoop.setCost(computeCost(forLoop));
+		// }
 	}
 
 	public int computeCost(ForLoop loop) {
@@ -342,10 +472,12 @@ public class LER {
 		return cost;
 	}
 
-	private boolean isIndependent(ForLoop loop, Set<ForLoop> worklist) {
-		for (ForLoop otherLoop : worklist) {
-			if (loop != otherLoop && !Collections.disjoint(loop.getRelLoops(), otherLoop.getRelLoops())) {
+	private boolean isIndependent(ForLoop loop, LinkedList<Loop> worklist) {
+		for (Loop otherLoop : worklist) {
+			if(otherLoop instanceof ForLoop FL){
+				if (loop != FL && !Collections.disjoint(loop.getRelLoops(), FL.getRelLoops())) {
 				return false;
+				}
 			}
 		}
 
@@ -360,40 +492,40 @@ public class LER {
 		Forest F = new Forest();
 		List<ForLoop> loopsToRemove = new ArrayList<>(); // Store loops to remove
 
-		for (ForLoop thisLoop : worklist) {
-			if (thisLoop.getRelLoops().isEmpty() || isIndependent(thisLoop, worklist)) {
-				F.addNode(thisLoop);
-				loopsToRemove.add(thisLoop); // Add to remove list
-			}
-		}
+		// for (ForLoop thisLoop : worklist) {
+		// 	if (thisLoop.getRelLoops().isEmpty() || isIndependent(thisLoop, worklist)) {
+		// 		F.addNode(thisLoop);
+		// 		loopsToRemove.add(thisLoop); // Add to remove list
+		// 	}
+		// }
+		// System.out.println(loopsToRemove.size());
+		// worklist.removeAll(loopsToRemove);
 
-		worklist.removeAll(loopsToRemove);
+		// while (!worklist.isEmpty()) {
+		// 	ForLoop thisLoop = findMinimumCostLoop(worklist);
 
-		while (!worklist.isEmpty()) {
-			ForLoop thisLoop = findMinimumCostLoop(worklist);
-
-			worklist.remove(thisLoop);
-			F.addNode(thisLoop);
-			for (ForLoop l : worklist) {
-				if (isSubset(thisLoop.getRelLoops(), l.getRelLoops())) {
+		// 	worklist.remove(thisLoop);
+		// 	F.addNode(thisLoop);
+		// 	for (ForLoop l : worklist) {
+		// 		if (isSubset(thisLoop.getRelLoops(), l.getRelLoops())) {
 																		
 
-					l.addChild(thisLoop);
-					l.setCost(l.getCost() / thisLoop.getIndexRange());
-				}
-			}
+		// 			l.addChild(thisLoop);
+		// 			//l.setCost(l.getCost() / thisLoop.getIndexRange());
+		// 		}
+		// 	}
 
-			for (ForLoop c : thisLoop.getChildren()) {
-				if (c.getParent() != null) {
-					c.getParent().removeChild(c);
-				} else {
-					c.setParent(thisLoop);
-				}
-			}
-		}
+		// 	for (ForLoop c : thisLoop.getChildren()) {
+		// 		if (c.getParent() != null) {
+		// 			c.getParent().removeChild(c);
+		// 		} else {
+		// 			c.setParent(thisLoop);
+		// 		}
+		// 	}
+		// }
 
-		// Output forest F
-		F.output();
+		// // Output forest F
+		// F.output();
 	}
 
 }
