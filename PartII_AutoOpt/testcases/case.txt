@@ -1,1 +1,1 @@
-Σinter∫0,iter∫Σj∫0,N∫b[j]=a[2*i]
+Σi∫1,M∫Σj∫1,M∫Γk∫1,N∫Σl∫1,N∫x[i,l]*y[l,j]*s[j,k]=r[i,k]

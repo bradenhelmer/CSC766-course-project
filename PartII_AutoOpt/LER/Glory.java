@@ -39,6 +39,7 @@ public class Glory {
 
 		// Print Optimized
 		System.out.println("Optimized LER:");
+
 		ler.outputLER();
 		System.out.println();
 
