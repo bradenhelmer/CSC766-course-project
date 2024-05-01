@@ -15,7 +15,8 @@ try:
 	os.chdir("LER/")
 	# os.system("javac Glory.java DirectiveListener.java")
 	for testCase in casePathDict.keys():
-		os.system("java Glory ../" + testCase + " > ../testResult/" + casePathDict.get(testCase)+".result.txt")
+         print(testCase)
+         os.system("java Glory ../" + testCase + " > ../testResult/" + casePathDict.get(testCase)+".result.txt")
 
 
 except OSError as msg:

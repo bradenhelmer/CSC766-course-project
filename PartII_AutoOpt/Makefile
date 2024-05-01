@@ -12,3 +12,5 @@ clean:
 
 test: compile
 	java --class-path="./LER:$$CLASSPATH" Glory testcases/case2.txt
+
+
