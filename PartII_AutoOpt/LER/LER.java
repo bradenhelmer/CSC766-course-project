@@ -299,7 +299,9 @@ public class LER {
 	public void optimize() {
 		abstractOperands();
 		cat3Removal();
-		//cat4Removal();
+		if (optimized.isEmpty()) {
+			cat4Removal();
+		}
 	}
 
 	// Performs operand abstraction, computing relLoops(x) for each operand.
@@ -312,123 +314,162 @@ public class LER {
 
 	}
 
-	private void cat3Removal(){
-		setRelLoopsForForLoops();
-		
-		ArrayList<Operand> toBeMoved;
-		ArrayList<Operand> stayingPut ;
-		int tempNum = 0;
-		//ArrayList<Operand>[] toBeMoved = new ArrayList[loops.size()];
-		// for (int i = 0; i < loops.size(); i++) {
-		// 	toBeMoved[i] = new ArrayList<Operand>();
-		// }
-		for (int i = 0; i< loops.size(); i++) {
-			toBeMoved = new ArrayList<Operand>();
-			stayingPut = new ArrayList<Operand>();
-			Loop L = loops.get(i);
-			if (L instanceof ForLoop FL) {
-				for (Operand O : operands) {
-					if (!O.getRelLoops().isEmpty()) {
-						// We need to check here that we havent already looked at an operand.
-						if (!O.getRelLoops().contains(FL.getIter()) )//&& !stayingPut.contains(O)
-							toBeMoved.add(O);
-						else if(O.getRelLoops().contains(FL.getIter()))
-							stayingPut.add(O);
-					}
-				}
-				FL.setCost(toBeMoved);
-				FL.setOperand(stayingPut);
-				System.out.println("tobemoved"+toBeMoved+ "!!" + stayingPut);
-			} else {
-				for (Operand O : operands) {
-					if (O.isIndexed()) {
-						toBeMoved.add(O);
-					}
-				}
-			}			
-			
-			// }Σi∫1,M∫Σj∫1,M∫Γk∫1,N∫Σl∫1,N∫x[i,l]*y[l,j]*s[j,k]=r[i,k]//Σi∫1,N∫Σj∫1,N∫Σk∫1,N∫Σt∫1,N∫a[i,j]*b[i,k]=x
-		}
-		ForLoop thisLoop = findMinimumCostLoop();
-		//System.out.println("cost"+thisLoop.getCost());
-		// if(thisLoop.getOperand().isEmpty()){
+	// Category 3 Redudancy Removal Algorithm Pseudo Code
+	// -------------------------------------------------- 
+	// 1. Find Operands that can be removed from current loop nest -> toBeMoved (List<Operand>)
+	// 		1. Other operands that cannot be moved -> stayingPut (List<Operand>)
+	// 
+	// 2. For each operand in toBeMoved...
+	// 		1. Find their associated loops (relLoops) and clone them into -> newLoops (List<ForLoop>)
+	//
+	//      2. Utilize min-union code to derive best combinations of loops.
+	//		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	//		Not sure if this should go here or somewhere below but this is my best guess.
+	//
+	// 3. Create a new LER object that for the removed loops -> newLER (LER)
+	// 		1. Derive the new result/temp operand for newLER from the relLoops of each operand in toBeMoved -> newResult (Operand)	
+	// 			- This will most likely need some manipulation methods in the Operand class for creating new indexes.
+	//
+	// 		2. For each loop in newLoops, add loop into newLER.
+	//
+	// 		3. newLER.setResult(newResult)
+	// 		
+	// 		4. Add all operands from toBeMoved into the newLER
+	// 	
+	// 	4. Modify the existing LER object to replace the moved operands with the newLER result (temp varaible)
+	// 		1. Assuming the operand(s) removed are in order...
+	//
+	// 			1. The first operand in toBeMoved: newResult.setPrevOp(toBeMoved.get(0).getPrevOp())
+	// 											   newResult.setNextOp(toBeMoved.get(toBeMoved.size() - 1).getNextOp())
+	// 				- This allows the operands to be in order when the final result gets printed.
+	//
+	// 		2. Remove operands in original LER (this) and replace with result of newLER (newReslt), need to keep track of where the last operand
+	// 		   was removed so that it can be inserted correctly.
+	//
+	//      3. Now that we have the operands in place, ensure that the original LER (this) has the correct loops, removing any that
+	//         are unnecessary.
+	//  
+	//  5. Add newLER into optimized (this.optimized.add(newLER))
+	//  
+	//  6. Add this into optimized (this.optimized.add(this))
+	//
+	
 
-		// }
-		//ArrayList<Operand> operandsWithMatchingRelLoops = new ArrayList<Operand>();
-		Set<String> currRelLoops = new LinkedHashSet<String>();
-
-		ArrayList<Operand> candidateOp = thisLoop.getToBeMoved();
-		
-		if (candidateOp != null) {
-			for (int j = 0; j < candidateOp.size(); j++) {
-				currRelLoops.addAll(candidateOp.get(j).getRelLoops());
-			}
-		}
-				
-			// System.out.println("currRelLoops" + currRelLoops);
-			// // Get actual loops for new LER
-			List<Loop> loopList = getForLoopsFromRelLoops(currRelLoops);
-			
-			System.out.println("loppList" + loopList);
-			// Construct new LER for removed loops.
-			LER newLer = new LER();
-			loopList.forEach(loop -> newLer.addLoop(loop));
-			Operand newResult;
-			if (result.isIndexed()) {
-				System.out.println("injaaa");
-				Operand rClone = (Operand) result.clone();
-				rClone.replaceVarName(String.format("TEMP%d", tempNum++));
-				newResult = rClone;
-				System.out.println("injaaa" + newResult);
-			} else {
-				System.out.println("injaaa222");
-				newResult = new Operand(String.format("TEMP%d", tempNum++));
-			}
-			
-			newResult.setPrevOp(thisLoop.getToBeMoved().get(0).getPrevOp());
-			newResult.setNextOp(
-				thisLoop.getToBeMoved().get(thisLoop.getToBeMoved().size() - 1).getNextOp());
-			List<Operand> clones = new ArrayList<Operand>();
-			for (Operand O : thisLoop.getToBeMoved()) {
-				clones.add((Operand) O.clone());
-			}
-			clones.get(0).setPrevOp("");
-			clones.get(clones.size() - 1).setNextOp("");
-			newLer.addOperands(clones);
-			newLer.setResult(newResult);
-
-			// Do operand switch
-			int last_index = 0;
-			for (Operand O : thisLoop.getOperand()) {
-				if (operands.contains(O)) {
-					System.out.println("injaaa3");
-					last_index = operands.indexOf(O);
-					operands.remove(O);
-				}
-			}
-
-			// Clean up unnecessary loops in self
-			for (Loop l : loops) {
-				if (l instanceof ForLoop FL) {
-					boolean stay = false;
-					for (Operand O : operands) {
-						if (O.isIndexed() && O.getRelLoops().contains(FL.getIter())) {
-							stay = true;
-						}
-					}
-					if (!stay) {
-						loops.remove(l);
-					}
-				}
-			}
-
-			operands.add(last_index, newResult);
-			optimized.add(newLer);
-			optimized.add(this);
-
-		//}
-		//minUnion() ;
-	}
+	private void cat3Removal(){}
+	// 	setRelLoopsForForLoops();
+	// 	
+	// 	ArrayList<Operand> toBeMoved;
+	// 	ArrayList<Operand> stayingPut ;
+	// 	int tempNum = 0;
+	// 	//ArrayList<Operand>[] toBeMoved = new ArrayList[loops.size()];
+	// 	// for (int i = 0; i < loops.size(); i++) {
+	// 	// 	toBeMoved[i] = new ArrayList<Operand>();
+	// 	// }
+	// 	for (int i = 0; i< loops.size(); i++) {
+	// 		toBeMoved = new ArrayList<Operand>();
+	// 		stayingPut = new ArrayList<Operand>();
+	// 		Loop L = loops.get(i);
+	// 		if (L instanceof ForLoop FL) {
+	// 			for (Operand O : operands) {
+	// 				if (!O.getRelLoops().isEmpty()) {
+	// 					// We need to check here that we havent already looked at an operand.
+	// 					if (!O.getRelLoops().contains(FL.getIter()) )//&& !stayingPut.contains(O)
+	// 						toBeMoved.add(O);
+	// 					else if(O.getRelLoops().contains(FL.getIter()))
+	// 						stayingPut.add(O);
+	// 				}
+	// 			}
+	// 			FL.setCost(toBeMoved);
+	// 			FL.setOperand(stayingPut);
+	// 			System.out.println("tobemoved"+toBeMoved+ "!!" + stayingPut);
+	// 		} else {
+	// 			for (Operand O : operands) {
+	// 				if (O.isIndexed()) {
+	// 					toBeMoved.add(O);
+	// 				}
+	// 			}
+	// 		}			
+	// 		
+	// 		// }Σi∫1,M∫Σj∫1,M∫Γk∫1,N∫Σl∫1,N∫x[i,l]*y[l,j]*s[j,k]=r[i,k]//Σi∫1,N∫Σj∫1,N∫Σk∫1,N∫Σt∫1,N∫a[i,j]*b[i,k]=x
+	// 	ForLoop thisLoop = findMinimumCostLoop();
+	// 	//System.out.println("cost"+thisLoop.getCost());
+	// 	// if(thisLoop.getOperand().isEmpty()){
+	//
+	// 	// }
+	// 	//ArrayList<Operand> operandsWithMatchingRelLoops = new ArrayList<Operand>();
+	// 	Set<String> currRelLoops = new LinkedHashSet<String>();
+	//
+	// 	ArrayList<Operand> candidateOp = thisLoop.getToBeMoved();
+	// 	
+	// 	if (candidateOp != null) {
+	// 		for (int j = 0; j < candidateOp.size(); j++) {
+	// 			currRelLoops.addAll(candidateOp.get(j).getRelLoops());
+	// 		}
+	// 	}
+	// 			
+	// 		// System.out.println("currRelLoops" + currRelLoops);
+	// 		// // Get actual loops for new LER
+	// 		List<Loop> loopList = getForLoopsFromRelLoops(currRelLoops);
+	// 		
+	// 		System.out.println("loppList" + loopList);
+	// 		// Construct new LER for removed loops.
+	// 		LER newLer = new LER();
+	// 		loopList.forEach(loop -> newLer.addLoop(loop));
+	// 		Operand newResult;
+	// 		if (result.isIndexed()) {
+	// 			System.out.println("injaaa");
+	// 			Operand rClone = (Operand) result.clone();
+	// 			rClone.replaceVarName(String.format("TEMP%d", tempNum++));
+	// 			newResult = rClone;
+	// 			System.out.println("injaaa" + newResult);
+	// 		} else {
+	// 			System.out.println("injaaa222");
+	// 			newResult = new Operand(String.format("TEMP%d", tempNum++));
+	// 		}
+	// 		
+	// 		newResult.setPrevOp(thisLoop.getToBeMoved().get(0).getPrevOp());
+	// 		newResult.setNextOp(
+	// 			thisLoop.getToBeMoved().get(thisLoop.getToBeMoved().size() - 1).getNextOp());
+	// 		List<Operand> clones = new ArrayList<Operand>();
+	// 		for (Operand O : thisLoop.getToBeMoved()) {
+	// 			clones.add((Operand) O.clone());
+	// 		}
+	// 		clones.get(0).setPrevOp("");
+	// 		clones.get(clones.size() - 1).setNextOp("");
+	// 		newLer.addOperands(clones);
+	// 		newLer.setResult(newResult);
+	//
+	// 		// Do operand switch
+	// 		int last_index = 0;
+	// 		for (Operand O : thisLoop.getOperand()) {
+	// 			if (operands.contains(O)) {
+	// 				System.out.println("injaaa3");
+	// 				last_index = operands.indexOf(O);
+	// 				operands.remove(O);
+	// 			}
+	// 		}
+	//
+	// 		// Clean up unnecessary loops in self
+	// 		for (Loop l : loops) {
+	// 			if (l instanceof ForLoop FL) {
+	// 				boolean stay = false;
+	// 				for (Operand O : operands) {
+	// 					if (O.isIndexed() && O.getRelLoops().contains(FL.getIter())) {
+	// 						stay = true;
+	// 					}
+	// 				}
+	// 				if (!stay) {
+	// 					loops.remove(l);
+	// 				}
+	// 			}
+	// 		}
+	//
+	// 		operands.add(last_index, newResult);
+	// 		optimized.add(newLer);
+	// 		optimized.add(this);
+	//
+	// 	//minUnion() ;
+	// }
 
 	private void setRelLoopsForForLoops() {
 		

@@ -11,25 +11,25 @@ public class ForLoop implements LER.Loop {
 	private int step = 1;
 	private String ID;
 
-    private int cost;
-    private Set<String> relLoops;
-    private Set<ForLoop> children;
-    private ForLoop parent;
-    private int indexRange;
+	private int cost;
+	private Set<String> relLoops;
+	private Set<ForLoop> children;
+	private ForLoop parent;
+	private int indexRange;
 	private ArrayList<Operand> toBeMoved;
 	private ArrayList<Operand> stayingPut;
-  
+
 	public ForLoop(String iter, String lb, String ub, int type) throws IllegalArgumentException {
 		this.iter = iter;
 		this.lb = lb;
 		this.ub = ub;
 		this.ID = ID;
 
-        this.cost = 0;
-        this.relLoops = new HashSet<>();
-        this.children = new HashSet<>();
-        this.parent = null;
-        this.indexRange = 1;
+		this.cost = 0;
+		this.relLoops = new HashSet<>();
+		this.children = new HashSet<>();
+		this.parent = null;
+		this.indexRange = 1;
 		this.toBeMoved = new ArrayList<Operand>();
 		this.stayingPut = new ArrayList<Operand>();
 
@@ -98,6 +98,7 @@ public class ForLoop implements LER.Loop {
 	// Setter for step
 	public void setStep(int step) {
 		this.step = step;
+	}
 
 	public int getCost() {
 		System.out.print(cost);
@@ -163,11 +164,10 @@ public class ForLoop implements LER.Loop {
 
 	public void setRelLoops(Set<String> relLoops) {
 
-		//System.out.printf("SetFor %s",relLoops);
+		// System.out.printf("SetFor %s",relLoops);
 		for (String loop : relLoops) {
-            this.relLoops.add(loop);
-        }
-    }
+			this.relLoops.add(loop);
+		}
 
 		// System.out.printf("SetFor %s",relLoops);
 		this.relLoops = relLoops;
@@ -177,6 +177,5 @@ public class ForLoop implements LER.Loop {
 	public void printCStmt() {
 		System.out.printf("for (int %s = %s; %s <= %s; ++%s) {\n", iter, lb, iter, ub, iter);
 	}
-
 
 }
