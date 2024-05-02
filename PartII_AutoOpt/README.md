@@ -22,3 +22,4 @@ The output result for each test case is the original LER notation as input, foll
 
 ### Bugs and Limitations
 ...
+Category 3 removal doesn't assign the indexes to TEMP variables correctly. The Minimum Union Algorithm is developed and works properly. However, we didn't have enough time to integrate it, so the Category 3 removal section has a problem in transforming to new LERs.
